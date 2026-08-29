@@ -1,0 +1,433 @@
+# commit.rules — execution policy for the git commit workflow.
+#
+# Commit-message conventions (preserved as code-level intent):
+#   Format: "<type>: <summary>"
+#   Types: build, repair, maintain, test, document, configure, revert
+#   One type per commit. User-visible changes -> build/repair.
+#   No user-visible change -> maintain/test/document/configure.
+#   Precedence when ambiguous: repair > build > configure > maintain > test > document.
+#
+# This file uses Starlark prefix_rule(...) per the Codex execpolicy contract.
+# See ~/.codex/docs/agent-configuration-rules.txt for the full convention.
+
+# ---------------------------------------------------------------------------
+# Read-only inspection (allow)
+# ---------------------------------------------------------------------------
+
+prefix_rule(
+    pattern = ["git", "status"],
+    decision = "allow",
+    justification = "Read-only working-tree and index inspection; safe for commit workflow.",
+    match = [
+        "git status",
+        "git status --short",
+        "git status --porcelain",
+    ],
+    not_match = [
+        "git statusx",
+        "git commit",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "diff"],
+    decision = "allow",
+    justification = "Read-only comparison of working tree, index, and commits.",
+    match = [
+        "git diff",
+        "git diff --cached",
+        "git diff --staged",
+    ],
+    not_match = [
+        "git diffx",
+        "git commit",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "log"],
+    decision = "allow",
+    justification = "Read-only commit history inspection.",
+    match = [
+        "git log",
+        "git log --oneline",
+        "git log --graph",
+    ],
+    not_match = [
+        "git logx",
+        "git status",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "show"],
+    decision = "allow",
+    justification = "Read-only display of objects (commits, tags, trees, blobs).",
+    match = [
+        "git show",
+        "git show HEAD",
+        "git show abc1234",
+    ],
+    not_match = [
+        "git showx",
+        "git status",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "ls-files"],
+    decision = "allow",
+    justification = "Read-only list of files in the index.",
+    match = [
+        "git ls-files",
+        "git ls-files -m",
+    ],
+    not_match = [
+        "git ls-filesx",
+        "git status",
+        "git",
+    ],
+)
+
+# ---------------------------------------------------------------------------
+# Core commit workflow (allow; narrow exceptions are prompt or forbidden)
+# ---------------------------------------------------------------------------
+
+prefix_rule(
+    pattern = ["git", "add"],
+    decision = "allow",
+    justification = "Stage changes for the next commit; core commit workflow.",
+    match = [
+        "git add file.txt",
+        "git add -A",
+        "git add -p",
+    ],
+    not_match = [
+        "git addx",
+        "git status",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "commit"],
+    decision = "allow",
+    justification = "Create a commit. Use the commit-message convention: '<type>: <summary>'.",
+    match = [
+        "git commit -m \"build: add feature\"",
+        "git commit -am \"repair: fix bug\"",
+        "git commit --message \"maintain: refactor helper\"",
+    ],
+    not_match = [
+        "git commitx",
+        "git status",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "commit", "--amend"],
+    decision = "prompt",
+    justification = "Amending rewrites the last commit; review before rewriting published or shared history. Use --amend only for the most recent local commit.",
+    match = [
+        "git commit --amend",
+        "git commit --amend -m \"repair: corrected message\"",
+        "git commit --amend --no-edit",
+    ],
+    not_match = [
+        "git commit",
+        "git commit --amendx",
+        "git status",
+        "git",
+    ],
+)
+
+# ---------------------------------------------------------------------------
+# Local working-tree and index mutations (prompt)
+# ---------------------------------------------------------------------------
+
+prefix_rule(
+    pattern = ["git", ["rm", "mv"]],
+    decision = "prompt",
+    justification = "Remove or rename files tracked by Git; affects working tree and/or index.",
+    match = [
+        "git rm file.txt",
+        "git rm --cached file.txt",
+        "git mv old.txt new.txt",
+    ],
+    not_match = [
+        "git rmx file.txt",
+        "git status",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", ["checkout", "switch", "restore"]],
+    decision = "prompt",
+    justification = "Move HEAD, switch branches, or restore working-tree files; can overwrite uncommitted changes.",
+    match = [
+        "git checkout main",
+        "git switch main",
+        "git restore file.txt",
+    ],
+    not_match = [
+        "git checkoutx main",
+        "git status",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "reset"],
+    decision = "prompt",
+    justification = "Unstage or move the current branch pointer; can change index and HEAD.",
+    match = [
+        "git reset",
+        "git reset --soft HEAD~1",
+        "git reset --mixed HEAD",
+    ],
+    not_match = [
+        "git resetx",
+        "git status",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "reset", "--hard"],
+    decision = "forbidden",
+    justification = "Hard reset discards working-tree and index changes; use 'git reset --soft' or 'git restore' for safer alternatives.",
+    match = [
+        "git reset --hard",
+        "git reset --hard HEAD~1",
+    ],
+    not_match = [
+        "git reset",
+        "git reset --soft HEAD~1",
+        "git reset --hardx",
+        "git status",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", ["rebase", "merge", "cherry-pick", "revert"]],
+    decision = "prompt",
+    justification = "Rewrite or extend commit history; review to avoid accidental history mutation.",
+    match = [
+        "git rebase main",
+        "git merge feature",
+        "git cherry-pick abc1234",
+        "git revert abc1234",
+    ],
+    not_match = [
+        "git rebasex main",
+        "git status",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "stash"],
+    decision = "prompt",
+    justification = "Stash, apply, pop, drop, or list stashes; can modify working tree and stash list.",
+    match = [
+        "git stash",
+        "git stash push",
+        "git stash pop",
+        "git stash list",
+    ],
+    not_match = [
+        "git stashx",
+        "git status",
+        "git",
+    ],
+)
+
+# ---------------------------------------------------------------------------
+# Branch, tag, remote, and config management (prompt)
+# ---------------------------------------------------------------------------
+
+prefix_rule(
+    pattern = ["git", "branch"],
+    decision = "prompt",
+    justification = "List, create, rename, or delete branches; branch deletion is destructive.",
+    match = [
+        "git branch",
+        "git branch -a",
+        "git branch -c old new",
+    ],
+    not_match = [
+        "git branchx",
+        "git status",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "branch", "-D"],
+    decision = "forbidden",
+    justification = "Force-deleting a branch can discard unmerged work; use 'git branch -d' (safe delete) after verifying the branch is merged.",
+    match = [
+        "git branch -D feature",
+        "git branch -D -- feature",
+    ],
+    not_match = [
+        "git branch -d feature",
+        "git branch",
+        "git branch --delete feature",
+        "git status",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "tag"],
+    decision = "prompt",
+    justification = "List, create, annotate, or delete tags; tags are part of release history.",
+    match = [
+        "git tag",
+        "git tag -a v1.0.0 -m \"build: release 1.0.0\"",
+        "git tag v1.0.0",
+    ],
+    not_match = [
+        "git tagx",
+        "git status",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "tag", ["-d", "--delete", "-f", "--force"]],
+    decision = "forbidden",
+    justification = "Deleting or forcing a tag rewrites published tag history. Prefer non-destructive 'git tag' listing or 'git tag -a' creation; delete or retag only after explicit operator review, or in a separate, controlled release step.",
+    match = [
+        "git tag -d v1.0.0",
+        "git tag --delete v1.0.0",
+        "git tag -f v1.0.0",
+        "git tag --force v1.0.0",
+    ],
+    not_match = [
+        "git tag",
+        "git tag -a v1.0.0",
+        "git tag v1.0.0",
+        "git status",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "remote"],
+    decision = "prompt",
+    justification = "Inspect or modify remote repository configuration.",
+    match = [
+        "git remote",
+        "git remote -v",
+        "git remote add origin https://example.com/repo.git",
+    ],
+    not_match = [
+        "git remotex",
+        "git status",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "config"],
+    decision = "prompt",
+    justification = "Read or change repository, global, or system Git configuration.",
+    match = [
+        "git config --list",
+        "git config user.name \"Name\"",
+    ],
+    not_match = [
+        "git configx",
+        "git status",
+        "git",
+    ],
+)
+
+# ---------------------------------------------------------------------------
+# Remote-affecting and destructive commands (forbidden or prompt)
+# ---------------------------------------------------------------------------
+
+prefix_rule(
+    pattern = ["git", "push"],
+    decision = "prompt",
+    justification = "Pushing sends local history to a remote; review the refspec and remote first. Use 'git push --force-with-lease' instead of '--force' if a force push is truly necessary.",
+    match = [
+        "git push",
+        "git push origin main",
+        "git push --force-with-lease origin main",
+    ],
+    not_match = [
+        "git pushx",
+        "git status",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "push", ["--force", "-f"]],
+    decision = "forbidden",
+    justification = "Force push can overwrite remote history and lose others' work; use 'git push --force-with-lease' or a non-force push after review.",
+    match = [
+        "git push --force",
+        "git push -f",
+        "git push --force origin main",
+        "git push -f origin main",
+    ],
+    not_match = [
+        "git push",
+        "git push --force-with-lease",
+        "git push --ff",
+        "git status",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "clean"],
+    decision = "forbidden",
+    justification = "Clean deletes untracked files from the working tree. Do not auto-run git clean: remove untracked files manually, or run a separate, operator-reviewed 'git clean -n' dry-run outside the auto-approval path, then delete manually.",
+    match = [
+        "git clean -fd",
+        "git clean -f",
+        "git clean -fdx",
+    ],
+    not_match = [
+        "git cleanx",
+        "git status",
+        "git",
+    ],
+)
+
+# ---------------------------------------------------------------------------
+# Shell wrappers (prompt — do not allow broad interpreter access)
+# ---------------------------------------------------------------------------
+
+prefix_rule(
+    pattern = [["bash", "sh", "zsh"], ["-c", "-lc"]],
+    decision = "prompt",
+    justification = "Shell wrappers (bash -c, bash -lc, sh -c, sh -lc, zsh -c, zsh -lc) may conceal destructive commands. If the script is a plain linear chain, Codex splits it and each command is evaluated independently; the strictest decision governs. If the script uses redirection, substitution, variables, wildcards, or control flow, the whole invocation is treated as one command.",
+    match = [
+        "bash -c \"git status\"",
+        "bash -lc \"git status && git log\"",
+        "sh -c \"git add .\"",
+        "sh -lc \"git commit -m 'maintain: update'\"",
+        "zsh -c \"git status\"",
+        "zsh -lc \"git diff | less\"",
+        "bash -c \"git status > /tmp/status.txt\"",
+    ],
+    not_match = [
+        "bash",
+        "bash -l",
+        "bash -x \"git status\"",
+        "sh",
+        "sh -l",
+        "zsh",
+        "zsh -i",
+        "zsh -l",
+    ],
+)

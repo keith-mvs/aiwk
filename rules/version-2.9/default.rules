@@ -1,0 +1,81 @@
+# Codex default command rules — re-added with the valid "forbidden" decision.
+# The old rules used the invalid "deny" decision and were rejected by codex 0.130.0.
+# These rules are a fail-closed safety net for destructive commands not covered
+# by domain-specific rule files (commit.rules, testing.rules, ...).
+# Additional destructive prefixes are marked <TBD> pending explicit operator review.
+
+prefix_rule(
+    pattern = ["tmux", "send-keys"],
+    decision = "forbidden",
+    justification = "Sending keystrokes to tmux panes can drive arbitrary commands in a running session; use direct command execution or pane interaction instead.",
+    match = [
+        "tmux send-keys Enter",
+        "tmux send-keys -t 0 \"ls\"",
+        "tmux send-keys -R",
+    ],
+    not_match = [
+        "tmux",
+        "tmux list-sessions",
+        "tmux send-keysx",
+        "tmux list-keys",
+    ],
+)
+
+prefix_rule(
+    pattern = ["rm", ["-rf", "-fr", "-r", "-R"], ["--no-preserve-root", "/", "/*"]],
+    decision = "forbidden",
+    justification = "Recursive deletion of the root filesystem destroys the system. Remove only specific files or directories after explicit review.",
+    match = [
+        "rm -rf /",
+        "rm -fr /",
+        "rm -r /",
+        "rm -rf /*",
+        "rm -r /*",
+        "rm -rf --no-preserve-root /",
+        "rm -rf --no-preserve-root /*",
+    ],
+    not_match = [
+        "rm file.txt",
+        "rm -rf build/",
+        "rm -r /tmp/old",
+        "rm -rf -- /",
+        "rm --no-preserve-root",
+        "rm",
+    ],
+)
+
+prefix_rule(
+    pattern = ["rm", ["-rf", "-fr", "-r", "-R"], "--", ["/", "/*"]],
+    decision = "forbidden",
+    justification = "Recursive deletion of the root filesystem destroys the system; the '--' separator does not make it safe.",
+    match = [
+        "rm -rf -- /",
+        "rm -r -- /",
+        "rm -rf -- /*",
+    ],
+    not_match = [
+        "rm -rf /",
+        "rm -rf build/",
+        "rm -r /tmp/old",
+        "rm -- /",
+        "rm",
+    ],
+)
+
+prefix_rule(
+    pattern = ["rm", "--no-preserve-root", ["-rf", "-fr", "-r", "-R"], ["/", "/*"]],
+    decision = "forbidden",
+    justification = "Recursive deletion of the root filesystem with --no-preserve-root destroys the system. Remove only specific files or directories after explicit review.",
+    match = [
+        "rm --no-preserve-root -rf /",
+        "rm --no-preserve-root -r /*",
+        "rm --no-preserve-root -fr /",
+    ],
+    not_match = [
+        "rm -rf /",
+        "rm --no-preserve-root",
+        "rm --no-preserve-root /tmp/old",
+        "rm --no-preserve-root -rf build/",
+        "rm",
+    ],
+)

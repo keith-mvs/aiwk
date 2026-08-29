@@ -1,0 +1,354 @@
+# administrative.rules -- preserved governance content as Starlark comments.
+# This file contains no executable `prefix_rule` entries because its guidance is
+# not command-execution policy.
+#
+# ---
+# trigger: always_on
+# ---
+# 
+# # Filename and Extension Conventions
+# 
+# Keep names stable, descriptive, and predictable. Prefer consistency over cleverness.
+# 
+# This file defines a simple taxonomy for filenames and extensions across the repo, by category (scripts, docs, schemas, configs, workflows, prompts/rules, etc.).
+# 
+# 
+# ## 1. Filename Structure
+# 
+# Filenames SHOULD follow this logical structure:
+# 
+# - `prefix` (optional)
+# - `base` (required)
+# - `modifier_1` (optional)
+# - `modifier_2` (optional; may be a digit, letter, or short code)
+# - `suffix` (required in many system-facing cases)
+# - `extension` (required)
+# 
+# General pattern:
+# 
+# - `prefix-<base>-<modifier_1_optional>-<modifier_2_optional>.<suffix>.<extension>`
+# - Minimal pattern: `<base>.<extension>`
+# 
+# Examples:
+# 
+# - `requirements-tier_1.schema.json`
+# - `user-guide.md`
+# - `http-client.test.ts`
+# - `ci-config.dev.yml`
+# - `service-orders-v2.config.toml`
+# - `foo-bar.workflow.yaml`
+# - `chat-history-v1.prompt.md`
+# 
+# Guidance:
+# 
+# - `prefix`:
+#   - Optional scoping or domain tag (`org`, `team`, `product`, environment group).
+#   - Use when files live in shared or cross-project locations.
+#   - Example: `platform-orders-api.schema.json`.
+# - `base`:
+#   - Required core name that describes what the file *is* (domain entity, module, topic).
+#   - Avoid vague terms (`misc`, `temp`, `data`, `stuff`).
+#   - Prefer short, stable nouns (`orders`, `payments-api`, `deploy-pipeline`).
+# - `modifier_1`:
+#   - Optional qualifier for target, variant, or layer.
+#   - Examples: `client`, `server`, `internal`, `public`, `openapi`, `events`, `sync`.
+#   - Example: `orders-openapi.schema.json`.
+# - `modifier_2`:
+#   - Optional detail such as version, locale, or tier.
+#   - Examples: `v2`, `v2025-01-01`, `en_US`, `tier_1`.
+#   - Example: `payments-internal-v2.config.yaml`.
+# - `suffix`:
+#   - Semantic role of the file (e.g. `schema`, `config`, `workflow`, `test`, `spec`, `prompt`, `rules`).
+#   - For system-classified files (schemas, configs, workflows, prompts/rules), suffix is strongly RECOMMENDED and sometimes REQUIRED (see below).
+# - `extension`:
+#   - Technical file type (`json`, `yaml`, `md`, `py`, `ts`, `toml`, etc.).
+#   - Follow standard, lowercase extensions unless ecosystem conventions say otherwise.
+# 
+# 
+# ## 2. Naming by Category
+# 
+# ### 2.1 Default / General Files
+# 
+# - Default style: `lowercase-kebab-case.ext`  
+#   - Example: `user-guide.md`, `http-client.ts`.
+# - Use one standard extension per file (`.md`, `.py`, `.ts`, `.json`, etc.).
+# - Name for what the file *is*, not how it’s implemented.
+# - Avoid vague names (`misc`, `temp`); prefer specific ones.
+# - If you must encode a version/date, use:
+#   - `-vN` (e.g. `api-schema-v2.json`).
+#   - `-YYYY-MM-DD` (e.g. `pricing-rules-2025-01-01.json`).
+# 
+# ### 2.2 Schemas
+# 
+# All schema files MUST use:
+# 
+# - Pattern: `<base>-<support_1_optional>.schema.<file_type>`
+# - Where:
+#   - `<base>`: primary concept (e.g. `orders`, `payments-api`).
+#   - `<support_1_optional>`: variant or qualifier (e.g. `openapi`, `events`, `db`, `graphql`).
+#   - `.schema`: required suffix.
+#   - `<file_type>`: data serialization (`json`, `yaml`, `yml`, `avsc`, `graphql`, etc.).
+# 
+# Examples:
+# 
+# - `orders-openapi.schema.json`
+# - `payments-events.schema.json`
+# - `analytics-db.schema.yaml`
+# - `catalog.graphql.schema.graphql` (when tooling expects `.graphql`).
+# - `telemetry-v2.schema.json`
+# 
+# Additional guidance:
+# 
+# - For multi-version schemas, prefer:
+#   - `orders-openapi-v2.schema.json` OR `orders-openapi-v2025-01-01.schema.json`.
+# - Keep schema names stable across environments; encode environment in config, not in the schema filename when possible.
+# 
+# ### 2.3 Configs
+# 
+# All config files in this “structured config” category SHOULD use:
+# 
+# - Pattern: `<filename>-<filename_optional>.config.<file_type>`
+# - Where:
+#   - `<filename>`: primary subject (`ci`, `logging`, `service-orders`).
+#   - `<filename_optional>`: qualifier (environment, region, tier, profile).
+#   - `.config`: suffix for configs not already governed by ecosystem-specific naming.
+#   - `<file_type>`: `json`, `yaml`, `yml`, `toml`, `ini`, `properties`, etc.
+# 
+# Examples:
+# 
+# - `ci.config.yml`
+# - `ci-dev.config.yml`
+# - `logging-audit.config.json`
+# - `service-orders-eu.config.toml`
+# - `feature-flags-experiment_v1.config.yaml`
+# 
+# For ecosystem-standard config names (e.g. `tsconfig.json`, `pyproject.toml`, `Cargo.toml`, `package.json`), see **Standard Exceptions** and **Control / Config Extensions** below; do not wrap them in `.config.`.
+# 
+# ### 2.4 Workflows
+# 
+# Workflow-like definitions (CI/CD pipelines, orchestrations, job runners, automation flows) SHOULD use:
+# 
+# - Pattern: `<base>-<modifier_optional>.workflow.<file_type>`
+# - Where:
+#   - `<base>`: pipeline or workflow name (`deploy`, `nightly-backup`, `schema-sync`).
+#   - `<modifier_optional>`: environment or specialization (`prod`, `staging`, `manual`, `on-demand`).
+#   - `.workflow`: required suffix.
+#   - `<file_type>`: typically `yaml`/`yml`, sometimes `json`.
+# 
+# Examples:
+# 
+# - `deploy-prod.workflow.yaml`
+# - `deploy-staging.workflow.yml`
+# - `nightly-backup.workflow.yaml`
+# - `schema-sync-manual.workflow.yml`
+# 
+# Note: For platforms that impose their own naming or directory structures (e.g. `.github/workflows/*.yml`, GitLab CI `.gitlab-ci.yml`), keep the platform’s required names but you may still use `*.workflow.*` for internal or shared workflow definitions.
+# 
+# ### 2.5 Docs and Text
+# 
+# - Markdown / text:
+#   - `lowercase-kebab-case.md` (e.g. `architecture-decisions.md`, `api-contracts.md`).
+# - Long-form design artifacts:
+#   - Use clear base with optional version/date if needed:
+#     - `adr-0001-service-boundaries.md`
+#     - `perf-benchmark-2025-01-01.md`.
+# 
+# ### 2.6 Scripts / CLI
+# 
+# - Shell / CLI and similar executable scripts:
+#   - Prefer `lowercase-kebab-case`:
+#     - `deploy-prod.sh`
+#     - `backup-db.sh`
+#     - `generate-client-sdk.py`
+#   - Keep extensions explicit for clarity: `.sh`, `.bash`, `.ps1`, `.py`, `.rb`.
+# - For collections of small scripts, group by base:
+#   - `db-backup-full.sh`, `db-backup-incremental.sh`.
+# 
+# ### 2.7 Code by Language / Domain
+# 
+# - Python:
+#   - Importable modules and packages: `snake_case.py`, `snake_case/`.
+#   - Scripts / one-offs: either `snake_case.py` or `lowercase-kebab-case.py`; be consistent within a directory.
+#   - Tests: `test_*.py` or `*_test.py`, matching the module name.
+# - JavaScript / TypeScript:
+#   - Modules: `lowercase-kebab-case.[jt]s`.
+#   - Tests: append `.test` or `.spec` before the extension (e.g. `http-client.test.ts`, `http-client.spec.ts`).
+#   - Type declarations: `name.d.ts` with `name` in lowercase-kebab-case.
+# - Frontend components (React / similar):
+#   - Components / classes imported by name: `PascalCase` (e.g. `UserProfile.tsx`).
+#   - Nearby helpers/hooks: idiomatic names; prefer `lowercase-kebab-case` or `camelCase` for hooks:
+#     - `use-auth.ts`
+#     - `user-profile-helpers.ts`.
+# - C#, Java, similar:
+#   - One public type per file; filename `PascalCase` to match the type (e.g. `OrderService.cs`).
+# 
+# ### 2.8 Tests (Cross-Language)
+# 
+# - Mirror the target name and use a clear test suffix:
+#   - JS/TS: `file.test.ts` or `file.spec.ts`.
+#   - Python: `test_file.py` or `file_test.py`.
+#   - C#: match local style (e.g. `OrderServiceTests.cs`).
+# - Keep tests next to the code or in a parallel `tests`/`__tests__` tree; be consistent.
+# 
+# 
+# ## 3. Special / Administrative Files
+# 
+# ### 3.1 Standard Exceptions (Do Not Rename)
+# 
+# Follow common ecosystem conventions; do not rename these:
+# 
+# - Docs and meta:
+#   - `README.md`, `LICENSE`, `CHANGELOG.md`, `CONTRIBUTING.md`, `CODEOWNERS`, `CLAUDE.md`, `AGENTS.md`
+# - Dotfiles / config sentinels:
+#   - `.gitignore`, `.gitattributes`, `.editorconfig`, `.gitmodules`, `.github/`, `.vscode/`
+# - Language / tool configs:
+#   - `package.json`, `package-lock.json`, `pnpm-lock.yaml`, `yarn.lock`
+#   - `tsconfig.json`, `jsconfig.json`
+#   - `pyproject.toml`, `requirements.txt`, `Pipfile`, `Pipfile.lock`
+#   - `Cargo.toml`, `Cargo.lock`
+#   - `Makefile`, `CMakeLists.txt`
+#   - Other well-known top-level configs as required by tools.
+# 
+# ### 3.2 Administrative Rules and Control Files
+# 
+# Use a consistent approach for project- and tool-level rules/configs beyond the ecosystem defaults:
+# 
+# - Administrative rules:
+#   - Pattern: `<base>.rules.<file_type>`
+#   - Example categories:
+#     - `filename-conventions.rules.md`
+#     - `testing.rules.starlark`
+#     - `security-policies.rules.md`
+#     - `lint.rules.yaml`
+# - Prompt / template files:
+#   - Pattern: `<base>-<modifier_optional>.prompt.<file_type>`
+#   - Examples:
+#     - `bug-triage.prompt.md`
+#     - `release-notes.prompt.md`
+#     - `refactor-guidance-v1.prompt.md`
+# - Policy / guidance documents that aren’t tool-enforced:
+#   - Prefer `lowercase-kebab-case.md` under an appropriate directory (`docs/`, `policies/`, `guides/`).
+#   - If machine-consumable, consider `*.rules.*` or `*.policy.*` suffixes:
+#     - `rbac.policy.json`
+#     - `api-access.policy.yaml`.
+# 
+# Administrative files that act like configs may use `.config.` as well:
+# 
+# - `codestyle.config.toml`
+# - `coverage.config.json`
+# - `pipeline-limits.config.yaml`
+# 
+# 
+# ## 4. Extensions and File Types
+# 
+# ### 4.1 General Extension Rules
+# 
+# - Extensions SHOULD be lowercase.
+# - Use standard, widely recognized extensions whenever possible.
+# - Avoid custom or ambiguous extensions unless there is a clear project-level convention.
+# 
+# ### 4.2 Acronyms in File Types
+# 
+# - File type extensions that are acronyms remain uppercase in meaning but lowercase in spelling:
+#   - `json`, `yaml`, `yml`, `xml`, `xaml`, `avsc`, `sql`, `csv`, `tsv`, `html`, `css`, `js`, `ts`, `tsx`, `jsx`.
+# - Avoid mixing styles for the same logical type (`.YAML` vs `.yaml`); prefer one canonical form (`.yaml` or `.yml`) per project/directory.
+# 
+# ### 4.3 Grouped Extensions by Family
+# 
+# Group and reason about sub-extensions by their top-level family:
+# 
+# - Text / markup:
+#   - `.txt`, `.md`, `.rst`, `.adoc`
+# - JSON family:
+#   - `.json` (standard JSON)
+#   - `.jsonl` (JSON Lines)
+#   - `.geojson`, `.har` (tool-specific JSON variants)
+# - YAML / configuration:
+#   - `.yaml`, `.yml`
+# - XML family:
+#   - `.xml` (core XML)
+#   - `.xaml` (XAML)
+#   - `.xsl`, `.xslt` (XSLT stylesheets)
+#   - `.wsdl`, `.xsd` (XML-based definitions)
+# - Code:
+#   - `.py`, `.pyi`, `.pyx`
+#   - `.js`, `.mjs`, `.cjs`
+#   - `.ts`, `.tsx`
+#   - `.java`, `.kt`, `.kts`, `.groovy`
+#   - `.cs`, `.fs`, `.fsx`
+#   - `.go`, `.rs`, `.c`, `.h`, `.cpp`, `.hpp`, `.cc`
+# - Data:
+#   - `.csv`, `.tsv`, `.parquet`, `.avro` (`.avsc` schema), `.orc`
+# - Templates:
+#   - `.mustache`, `.handlebars`, `.hbs`, `.ejs`, `.jinja`, `.jinja2`, `.ftl`
+# - Scripts:
+#   - `.sh`, `.bash`, `.zsh`, `.ps1`, `.cmd`, `.bat`
+# - Archives / binaries:
+#   - `.zip`, `.tar`, `.tgz`, `.gz`, `.bz2`, `.xz`
+#   - `.jar`, `.war`, `.ear`
+#   - `.dll`, `.so`, `.dylib`, `.exe`
+# 
+# ### 4.4 Expanded Extensions (Prompts, Rules, Others)
+# 
+# Use specialized “meta” extensions to clarify semantics beyond the base type:
+# 
+# - Prompts:
+#   - Suffix: `.prompt.<file_type>`
+#   - Examples:
+#     - `onboarding.prompt.md`
+#     - `refactor-helper.prompt.txt`
+# - Rules:
+#   - Suffix: `.rules.<file_type>`
+#   - Examples:
+#     - `filename-conventions.rules.md`
+#     - `testing.rules.starlark`
+#     - `precommit.rules.yaml`
+# - Policies:
+#   - Suffix: `.policy.<file_type>`
+#   - Examples:
+#     - `data-retention.policy.yaml`
+#     - `security.policy.md`
+# - Mappings / dictionaries:
+#   - Suffix: `.map.<file_type>` or `.dictionary.<file_type>`
+#   - Example: `field-aliases.map.json`.
+# 
+# These should still follow the general filename structure (`prefix-base-modifiers.suffix.extension`).
+# 
+# ### 4.5 Control / Config File Types
+# 
+# Control and configuration files used by tools and frameworks:
+# 
+# - TOML / config:
+#   - `.toml` for structured config:
+#     - `pyproject.toml`
+#     - `tooling.config.toml`
+#   - `.config` combined with underlying type when appropriate:
+#     - `service-orders.config.toml`
+#     - `ci.config.yaml`
+# - `.pyproject.toml`:
+#   - Keep as-is; do not rename or wrap with `.config.`.
+# - Other common control files:
+#   - `.editorconfig`
+#   - `.prettierrc`, `.prettierrc.json`, `.prettierrc.yaml`
+#   - `.eslintrc`, `.eslintrc.json`, `.eslintrc.js`
+#   - `.stylelintrc`, `.pylintrc`, `.flake8`, `.coveragerc`, etc.
+# 
+# When introducing new control files, prefer either:
+# 
+# - Ecosystem standard names, or
+# - `<base>.config.<file_type>` when no standard exists.
+# 
+# 
+# ## 5. Directories and Renames
+# 
+# - Default directories: `lowercase-kebab-case/`.
+# - Respect ecosystem-required names:
+#   - `node_modules`, `__pycache__`, `.venv`, `dist`, `build`, `.git`, `.github`, `.vscode`, `__tests__`, etc.
+# - Within a directory, stick to one naming style where possible:
+#   - Avoid mixing `snake_case`, `lowercase-kebab-case`, and `PascalCase` arbitrarily.
+# - Before renaming:
+#   - Update references in code, tests, and tooling.
+#   - Check CI, deployment workflows, and scripts for hard-coded paths.
+# - For large migrations:
+#   - Plan and stage changes.
+#   - Maintain shims or redirects if tooling or external users depend on old names.

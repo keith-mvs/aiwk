@@ -1,0 +1,424 @@
+# testing.rules — execution policy for test and verification commands.
+#
+# Testing conventions (preserved as code-level intent):
+#   - Tests are first-class, stable behavior specifications.
+#   - Add a test for every non-trivial change; write regression tests before fixes.
+#   - Coverage proportional to risk; fast, deterministic, isolated tests.
+#   - Run narrow-to-broad: unit -> integration -> system.
+#
+# This file uses Starlark prefix_rule(...) per the Codex execpolicy contract.
+# See ~/.codex/docs/agent-configuration-rules.txt for the full convention.
+
+# ---------------------------------------------------------------------------
+# .NET test and build runners
+# ---------------------------------------------------------------------------
+
+prefix_rule(
+    pattern = ["dotnet", "test"],
+    decision = "allow",
+    justification = "Run the .NET test project/solution. Safe test-runner invocation.",
+    match = [
+        "dotnet test",
+        "dotnet test --filter Category=Unit",
+        "dotnet test --framework net10.0",
+        "dotnet test --no-build",
+    ],
+    not_match = [
+        "dotnet testx",
+        "dotnet build",
+        "dotnet run",
+        "dotnet",
+    ],
+)
+
+prefix_rule(
+    pattern = ["dotnet", ["build", "run", "pack", "publish", "restore", "clean", "watch"]],
+    decision = "prompt",
+    justification = "Build, run, pack, publish, restore, clean, or watch .NET projects. These mutate outputs or may run arbitrary code; review before allowing.",
+    match = [
+        "dotnet build",
+        "dotnet run",
+        "dotnet pack",
+        "dotnet publish",
+        "dotnet restore",
+        "dotnet clean",
+        "dotnet watch",
+        "dotnet build --configuration Release",
+    ],
+    not_match = [
+        "dotnet test",
+        "dotnet buildx",
+        "dotnet",
+    ],
+)
+
+# ---------------------------------------------------------------------------
+# Python test runners
+# ---------------------------------------------------------------------------
+
+prefix_rule(
+    pattern = ["pytest"],
+    decision = "allow",
+    justification = "Run Python tests with pytest.",
+    match = [
+        "pytest",
+        "pytest -x",
+        "pytest tests/",
+        "pytest -k test_foo",
+    ],
+    not_match = [
+        "pytestx",
+        "python -m pytest",
+        "py.test",
+    ],
+)
+
+prefix_rule(
+    pattern = ["py.test"],
+    decision = "allow",
+    justification = "Run Python tests with the legacy py.test entry point.",
+    match = [
+        "py.test",
+        "py.test -x",
+    ],
+    not_match = [
+        "py.testx",
+        "pytest",
+        "python -m pytest",
+    ],
+)
+
+prefix_rule(
+    pattern = [["python", "python3"], "-m", ["pytest", "unittest"]],
+    decision = "allow",
+    justification = "Run Python tests via the module runner (pytest or unittest).",
+    match = [
+        "python -m pytest",
+        "python3 -m pytest",
+        "python -m pytest -x",
+        "python -m unittest",
+        "python -m unittest discover -s tests",
+    ],
+    not_match = [
+        "python -m pip",
+        "python -m pytestx",
+        "python",
+        "python3",
+    ],
+)
+
+# ---------------------------------------------------------------------------
+# Node / npm test runners
+# ---------------------------------------------------------------------------
+
+prefix_rule(
+    pattern = ["npm", "test"],
+    decision = "allow",
+    justification = "Run the package's test script as declared in package.json.",
+    match = [
+        "npm test",
+        "npm test -- --watch",
+    ],
+    not_match = [
+        "npm testx",
+        "npm run test",
+        "npm start",
+        "npm",
+    ],
+)
+
+prefix_rule(
+    pattern = ["npm", ["run", "start", "install", "ci", "exec", "x"]],
+    decision = "prompt",
+    justification = "Run arbitrary scripts, install dependencies, or execute packages. Review the script or package before allowing.",
+    match = [
+        "npm run build",
+        "npm start",
+        "npm install",
+        "npm ci",
+        "npm exec jest",
+        "npm x jest",
+    ],
+    not_match = [
+        "npm test",
+        "npm publish",
+        "npm runx",
+        "npm",
+    ],
+)
+
+prefix_rule(
+    pattern = ["npm", ["publish", "unpublish"]],
+    decision = "forbidden",
+    justification = "Publishing or unpublishing npm packages affects the public registry; do this in a separate, reviewed release step.",
+    match = [
+        "npm publish",
+        "npm publish --access public",
+        "npm unpublish",
+    ],
+    not_match = [
+        "npm test",
+        "npm run build",
+        "npm publishx",
+        "npm",
+    ],
+)
+
+prefix_rule(
+    pattern = ["npx"],
+    decision = "prompt",
+    justification = "npx can execute any package; review the package and arguments before allowing.",
+    match = [
+        "npx jest",
+        "npx vitest",
+        "npx --yes jest",
+    ],
+    not_match = [
+        "npxx",
+        "jest",
+        "npm test",
+    ],
+)
+
+prefix_rule(
+    pattern = ["node", "--test"],
+    decision = "allow",
+    justification = "Run Node's built-in test runner.",
+    match = [
+        "node --test",
+        "node --test tests/",
+    ],
+    not_match = [
+        "node script.js",
+        "node --eval \"console.log(1)\"",
+        "node",
+    ],
+)
+
+# ---------------------------------------------------------------------------
+# JavaScript / TypeScript test runners (when installed locally)
+# ---------------------------------------------------------------------------
+
+prefix_rule(
+    pattern = ["jest"],
+    decision = "allow",
+    justification = "Run Jest tests.",
+    match = [
+        "jest",
+        "jest --coverage",
+        "jest --watch",
+    ],
+    not_match = [
+        "jestx",
+        "npx jest",
+        "mocha",
+    ],
+)
+
+prefix_rule(
+    pattern = ["vitest"],
+    decision = "allow",
+    justification = "Run Vitest tests.",
+    match = [
+        "vitest",
+        "vitest run",
+        "vitest --coverage",
+    ],
+    not_match = [
+        "vitestx",
+        "npx vitest",
+        "jest",
+    ],
+)
+
+prefix_rule(
+    pattern = ["mocha"],
+    decision = "allow",
+    justification = "Run Mocha tests.",
+    match = [
+        "mocha",
+        "mocha --recursive",
+    ],
+    not_match = [
+        "mochax",
+        "npx mocha",
+        "jest",
+    ],
+)
+
+# ---------------------------------------------------------------------------
+# Make targets (test/validate/smoke targets allow; build/clean prompt/forbid)
+# ---------------------------------------------------------------------------
+
+prefix_rule(
+    pattern = ["make", ["test", "smoke", "validate", "check"]],
+    decision = "allow",
+    justification = "Run Makefile test, smoke, validation, or check targets.",
+    match = [
+        "make test",
+        "make smoke",
+        "make validate",
+        "make check",
+        "make test -j4",
+    ],
+    not_match = [
+        "make build",
+        "make clean",
+        "make testx",
+        "make -j4 test",
+        "make -j 4 test",
+        "make",
+    ],
+)
+
+prefix_rule(
+    pattern = ["make", ["build", "all"]],
+    decision = "prompt",
+    justification = "Run Makefile build targets; may compile and write build artifacts.",
+    match = [
+        "make build",
+        "make all",
+        "make build -j4",
+    ],
+    not_match = [
+        "make test",
+        "make clean",
+        "make buildx",
+        "make -j4 build",
+        "make",
+    ],
+)
+
+prefix_rule(
+    pattern = ["make", ["clean", "distclean", "clobber"]],
+    decision = "forbidden",
+    justification = "Make clean/distclean/clobber targets delete build artifacts; run them in a separate, reviewed step.",
+    match = [
+        "make clean",
+        "make distclean",
+        "make clobber",
+        "make clean -j4",
+    ],
+    not_match = [
+        "make test",
+        "make build",
+        "make cleanx",
+        "make -j4 clean",
+        "make",
+    ],
+)
+
+# ---------------------------------------------------------------------------
+# Go and Rust test runners
+# ---------------------------------------------------------------------------
+
+prefix_rule(
+    pattern = ["go", "test"],
+    decision = "allow",
+    justification = "Run Go tests.",
+    match = [
+        "go test",
+        "go test ./...",
+        "go test -run TestFoo",
+    ],
+    not_match = [
+        "go testx",
+        "go build",
+        "go",
+    ],
+)
+
+prefix_rule(
+    pattern = ["go", ["build", "run", "clean", "install"]],
+    decision = "prompt",
+    justification = "Build, run, clean, or install Go artifacts; may write or run arbitrary code.",
+    match = [
+        "go build",
+        "go run",
+        "go clean",
+        "go install",
+    ],
+    not_match = [
+        "go test",
+        "go buildx",
+        "go",
+    ],
+)
+
+prefix_rule(
+    pattern = ["cargo", "test"],
+    decision = "allow",
+    justification = "Run Rust tests with Cargo.",
+    match = [
+        "cargo test",
+        "cargo test --package foo",
+    ],
+    not_match = [
+        "cargo testx",
+        "cargo build",
+        "cargo",
+    ],
+)
+
+prefix_rule(
+    pattern = ["cargo", ["build", "run", "clean", "update", "install"]],
+    decision = "prompt",
+    justification = "Build, run, clean, update, or install Rust artifacts; may write or run arbitrary code.",
+    match = [
+        "cargo build",
+        "cargo run",
+        "cargo clean",
+        "cargo update",
+        "cargo install",
+    ],
+    not_match = [
+        "cargo test",
+        "cargo buildx",
+        "cargo",
+    ],
+)
+
+prefix_rule(
+    pattern = ["cargo", ["publish", "yank"]],
+    decision = "forbidden",
+    justification = "Publishing or yanking crates affects the public registry; do this in a separate, reviewed release step.",
+    match = [
+        "cargo publish",
+        "cargo yank",
+    ],
+    not_match = [
+        "cargo test",
+        "cargo build",
+        "cargo publishx",
+        "cargo",
+    ],
+)
+
+# ---------------------------------------------------------------------------
+# Shell wrappers (prompt — do not allow broad interpreter access)
+# ---------------------------------------------------------------------------
+
+prefix_rule(
+    pattern = [["bash", "sh", "zsh"], ["-c", "-lc"]],
+    decision = "prompt",
+    justification = "Shell wrappers (bash -c, bash -lc, sh -c, sh -lc, zsh -c, zsh -lc) may conceal destructive commands. If the script is a plain linear chain, Codex splits it and each command is evaluated independently; the strictest decision governs. If the script uses redirection, substitution, variables, wildcards, or control flow, the whole invocation is treated as one command.",
+    match = [
+        "bash -c \"dotnet test\"",
+        "bash -lc \"pytest && make test\"",
+        "sh -c \"npm test\"",
+        "sh -lc \"git status\"",
+        "zsh -c \"go test ./...\"",
+        "zsh -lc \"cargo test | tail\"",
+        "bash -lc \"pytest tests/ > /tmp/pytest.log\"",
+    ],
+    not_match = [
+        "bash",
+        "bash -l",
+        "bash -x \"dotnet test\"",
+        "sh",
+        "sh -l",
+        "zsh",
+        "zsh -i",
+        "zsh -l",
+    ],
+)

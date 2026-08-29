@@ -1,0 +1,43 @@
+# engineering.rules -- preserved governance content as Starlark comments.
+# This file contains no executable `prefix_rule` entries because its guidance is
+# not command-execution policy.
+#
+# ---
+# trigger: always_on
+# ---
+# 
+# # Engineering
+# 
+# ## Workflow
+# - Understand the problem, success criteria, and verification plan before editing code.
+# - Explore the codebase: identify entry points, data flows, invariants, and existing tests relevant to the change.
+# - Use the project’s configured environment (venv/conda/poetry/etc.) and keep dependencies pinned.
+# - Prefer extending existing patterns over introducing new frameworks or styles.
+# - Keep temporary artifacts (notes, scratch scripts) local; delete or clearly archive when no longer needed.
+# 
+# ## Coding
+# - Design first: data shapes, interfaces, failure modes, and performance expectations.
+# - Write small, composable functions with clear responsibilities and minimal side effects.
+# - Optimize for readability and maintainability over cleverness; follow the local style.
+# - Keep functions and modules focused; split or rename when responsibilities drift.
+# - Use explicit names for variables, functions, and modules that reflect intent, not implementation details.
+# - Fail fast with informative errors; include enough context to debug without reproducing.
+# - Log at appropriate levels (debug/info/warn/error) and avoid noisy or personally identifiable data.
+# - Keep dependencies minimal; prefer standard library and existing project utilities.
+# - Apply linters/formatters incrementally; if they fight the code, refine the code or configuration, not the rules.
+# - Prefer testable units over hard-to-mock global state or singletons.
+# 
+# ## Change Impact
+# - Never evaluate a change in isolation: trace callers, callees, data contracts, shared state, and end-to-end flows.
+# - Preserve and respect existing invariants, assumptions, and public contracts; document any intentional breaks.
+# - Consider concurrency, retries, timeouts, and failure recovery for I/O and long-running operations.
+# - Assess security, privacy, and performance implications for every externally visible change.
+# - Prefer backwards-compatible changes; if breaking behavior, document migration and rationale clearly.
+# 
+# 
+# ## Collaboration & Review
+# - Keep changesets small, coherent, and focused on a single purpose.
+# - Explain “why” in commit messages and PR descriptions; the diff already shows “what”.
+# - Prefer clarity in code over lengthy comments; comment only where intent or tradeoffs are non-obvious.
+# - Respond to review feedback constructively; resolve disagreements with data, references, or small experiments.
+# - Leave the codebase slightly better than you found it: clarify names, reduce duplication, and update docs where needed.
