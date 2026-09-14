@@ -1,4 +1,14 @@
-# Local Development Security Rules
+---
+title: Local Development Security Rules
+generated_at: 2026-09-14
+policy_version: 3
+status: active
+scope: repository
+rules_root: rules/version_3
+references:
+  - rules/version_3/AGENTS.md
+tags: [security, rules]
+---
 
 | Field | Value |
 | --- | --- |
@@ -35,11 +45,11 @@ Protect:
 | SEC-007 | Minimize sensitive data in prompts, context, fixtures, logs, reports, screenshots, and generated artifacts. |
 | SEC-008 | Report limitations, skipped checks, residual risk, and open findings explicitly. |
 
-## Secret classification and handling
-
 ## Executable command guardrails
 
 `.codex/rules/dangerous.rules` is a technical command-prefix guardrail. It can block or prompt selected shell commands, but it does not replace sandbox boundaries, approval policy, secret handling, or the security analysis in this file. Opaque wrappers and indirect dispatch fail closed only when the effective command is known.
+
+## Secret classification and handling
 
 Treat the following as sensitive unless the owner explicitly classifies them otherwise:
 
@@ -119,7 +129,7 @@ Do not print the environment wholesale. Filter to the exact variables required a
 
 - Use restricted temporary directories and predictable ownership.
 - Do not execute downloaded or generated files before establishing origin, integrity, type, and intended behavior.
-- Validate archive paths before extraction; reject traversal, absolute paths, device files, and unsafe symlinks.
+- Before extracting an archive, enumerate members and validate paths; reject absolute paths, `..` traversal outside the staging root, device files, named pipes, unexpected executable content, symlinks or hardlinks that resolve outside the staging root, and duplicate normalized paths that could overwrite one another. Preserve relative paths during analysis so duplicate filenames in different directories remain distinguishable.
 - Extract to a dedicated staging directory, not directly into source or a privileged path.
 - Quarantine or remove unexpected binaries and executable bits.
 - Do not trust a filename extension as proof of content type.
@@ -252,6 +262,22 @@ Report each as `PASS`, `FAIL`, `NOT PERFORMED`, or `<TBD>`. A skipped applicable
 7. Document the incident through the authorized channel.
 8. Do not claim remediation solely because the plaintext file was deleted.
 
+## Safe fallback under ambiguity
+
+When the destination, owner, authority, or required action is ambiguous:
+
+1. inspect existing structure and configuration;
+2. prefer the narrowest reversible location or read-only action;
+3. avoid creating a new top-level directory or configuration surface;
+4. preserve the ambiguity as `<TBD>` when a material decision cannot be established;
+5. do not mutate remote state, credentials, history, or security controls as a fallback.
+
+## Cross-references
+
+- Credential provider and SSH agent mechanics: `environments.rules.md`
+- Git/GitHub remote and publication boundaries: `remotes.rules.md`
+- Executable command guardrail: `.codex/rules/dangerous.rules`
+
 ## References
 
 - [NIST AI Risk Management Framework 1.0](https://www.nist.gov/itl/ai-risk-management-framework)
@@ -264,4 +290,4 @@ Report each as `PASS`, `FAIL`, `NOT PERFORMED`, or `<TBD>`. A skipped applicable
 
 ## Lineage and migration
 
-This file consolidates the identical baseline rules in `v1/security.md` and `v2/security.md`: mask secrets, use a vault or environment-mediated reference, never fabricate credentials, and consider OWASP risk classes. V3 adds Proton Pass CLI, SSH, prompt-injection, supply-chain, archive, dump, remote, permission, verification, and incident controls. It preserves the distinction between intended improvement and verified security.
+This file consolidates the identical baseline rules in `v1/security.md` and `v2/security.md`: mask secrets, use a vault or environment-mediated reference, never fabricate credentials, and consider OWASP risk classes. V3 adds Proton Pass CLI, SSH, prompt-injection, supply-chain, archive, dump, remote, permission, verification, and incident controls. It preserves the distinction between intended improvement and verified security. Archive member-validation requirements and the safe-fallback rule were absorbed from `general.rules.md` during the GEN migration.

@@ -227,6 +227,10 @@ Skill activation is not completion evidence.
 - Devin sees Skill discovery metadata at session start and loads the body when invoked.
 - Verify current product constraints, including invocation and active-Skill behavior, rather than generalizing them to other clients.
 
+## Cross-references
+
+- Instruction precedence and rule ownership: `AGENTS.md`
+
 ## References
 
 - [Agent Skills specification](https://agentskills.io/specification)

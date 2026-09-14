@@ -27,7 +27,7 @@ Render optional components with the repository's controlled separators; the defa
 | `prefix` | No | Scope, sequence, or category discriminator needed before the semantic identity |
 | `base` | Yes | Stable semantic identity of the artifact |
 | `modifier` | No; repeatable | Ordered variant information such as platform, audience, locale, version, or date |
-| `suffix` | No | Artifact role or lifecycle state such as `schema`, `template`, `generated`, `backup`, or `tmp` |
+| `suffix` | No | Artifact type or category such as `schema`, `config`, `template`, or `manifest` |
 | `extension` | As required | Standard media, language, or tool extension |
 
 Do not force every component to appear. The shortest unambiguous name is preferred.
@@ -104,7 +104,7 @@ Also preserve ecosystem-mandated names such as `pyproject.toml`, `package.json`,
 
 ## Markdown and rule files
 
-- Use lowercase kebab case for generic Markdown files.
+- Use `lowercase-kebab-case` for generic Markdown files.
 - Preserve the mandatory v3 filenames exactly.
 - Use ATX headings and stable heading text to avoid anchor churn.
 - Do not encode a transient status or generation timestamp in a stable policy filename.
@@ -208,6 +208,10 @@ agent_rules-v3-latest-copy.zip
 4. Update references atomically with the rename.
 5. Run link, import, build, packaging, and relevant behavior checks.
 6. Verify the old name is absent except in intentional migration history.
+
+## Cross-references
+
+- Test selection, execution, interpretation, and evidence: `testing.rules.md`
 
 ## Lineage and migration
 

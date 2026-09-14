@@ -1,4 +1,14 @@
-# Implementation and Code-Change Rules
+---
+title: Implementation and Code-Change Rules
+generated_at: 2026-09-14
+policy_version: 3
+status: active
+scope: repository
+rules_root: rules/version_3
+references:
+  - rules/version_3/AGENTS.md
+tags: [coding, implementation, rules]
+---
 
 | Field | Value |
 | --- | --- |
@@ -18,7 +28,7 @@ This file applies to new code, bug fixes, refactoring, API changes, configuratio
 | --- | --- | --- |
 | COD-001 | The agent MUST treat this file as the canonical owner for implementation-level code-change discipline. | The task rationale routes code-change questions here instead of spreading them across general policy. |
 | COD-002 | The agent MUST inspect the relevant implementation path before editing, including callers, callees, interfaces, data flow, invariants, configuration, tests, error handling, side effects, and generated ownership where applicable. | The change rationale names the inspected paths and the evidence used to choose the fix. |
-| COD-003 | The agent MUST prefer the smallest change that resolves the demonstrated problem and MUST avoid unrelated cleanup, speculative abstraction, opportunistic dependency upgrades, and broad formatting churn. | The final diff is narrow and task-owned. |
+| COD-003 | The agent MUST prefer the smallest change that resolves the demonstrated problem, MUST avoid unrelated cleanup, speculative abstraction, opportunistic dependency upgrades, and broad formatting churn, and MUST preserve unrelated user changes. | The final diff is narrow and task-owned; unrelated user changes are preserved. |
 | COD-004 | The agent MUST preserve relevant behavioral contracts, including public APIs, internal interfaces, serialization formats, error contracts, persistence formats, command-line interfaces, configuration keys, environment variables, and compatibility expectations. | Any intentional contract break is explicitly identified and justified. |
 | COD-005 | For defect remediation, the agent MUST identify the failing invariant or causal mechanism and fix the cause rather than merely suppressing the symptom. | The explanation distinguishes confirmed cause, likely cause, and unknown. |
 | COD-006 | The agent MUST handle errors explicitly when failure modes are meaningful, preserve useful causal information, propagate safely, avoid silent swallowing, avoid false-success states, and avoid sensitive-data leakage. | Failure paths remain observable and do not discard diagnostic context. |
@@ -32,9 +42,23 @@ This file applies to new code, bug fixes, refactoring, API changes, configuratio
 | COD-014 | The agent MUST use repository-native language and framework conventions where they are observable. | The change follows the local convention or a clearly higher-priority repository rule. |
 | COD-015 | The agent MUST treat completion as evidence-bound and MUST defer validation details to `testing.rules.md`. | The final report does not claim fixed, working, validated, passing, compatible, or performant without validation evidence. |
 
+## Change-impact procedure
+
+For every material change:
+
+1. Identify the user-visible or operator-visible behavior being changed.
+2. Trace inward to the owning source, configuration, data model, and dependencies.
+3. Trace outward through direct and transitive callers, jobs, queues, caches, storage, interfaces, and consumers where applicable.
+4. Identify compatibility, migration, security, performance, rollback, and observability effects.
+5. Select validation that observes the changed behavior at the narrowest useful boundary and at least one live or realistic entry point when feasible.
+6. Update code, schemas, configuration, tests, documentation, and runbooks only where the behavior or contract requires it.
+7. Re-run affected checks after the final change.
+
+Passing unit tests are a signal, not a complete change-impact analysis.
+
 ## Cross-references
 
-- Broad repository behavior, source-of-truth direction, and completion criteria: `general.rules.md`
+- Governing agent contract and precedence: `AGENTS.md`
 - Test selection, execution, interpretation, evidence, and regression-test integrity: `testing.rules.md`
 - Placement, generated artifacts, and local versus portable configuration: `configuration.rules.md`
 - Naming, file families, and generated-file markers: `naming.rules.md`
@@ -44,4 +68,4 @@ This file applies to new code, bug fixes, refactoring, API changes, configuratio
 
 ## Lineage and migration
 
-This file separates implementation discipline from the repository-wide ruleset so code-change ownership is explicit without duplicating general policy. It retains the change-impact intent previously distributed across older engineering guidance while making validation a dependency on `testing.rules.md` instead of a second owner.
+This file separates implementation discipline from the repository-wide ruleset so code-change ownership is explicit without duplicating general policy. It retains the change-impact intent previously distributed across older engineering guidance while making validation a dependency on `testing.rules.md` instead of a second owner. The change-impact procedure and the repository-wide minimal-change and preserve-unrelated-work requirements were absorbed from `general.rules.md` during the GEN migration.

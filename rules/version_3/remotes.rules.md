@@ -10,7 +10,7 @@
 
 ## Remote inventory and current evidence
 
-No target repository or user-host Git/GitHub configuration was available for direct inspection while this rule set was generated. Populate the following in `AGENTS.local.md` from the active worktree:
+Remote inventory and account facts are machine- and worktree-specific. Populate the following in `AGENTS.local.md` from the active worktree:
 
 | Field | Required discovery | Current value |
 | --- | --- | --- |
@@ -176,6 +176,13 @@ For add, rename, URL change, or removal:
 - For push, verify the exact remote response and compare the destination ref when possible.
 - For PR/release/repository creation, verify visibility, owner, target branches, and published content.
 - Report remote failures and partial effects; do not imply rollback occurred unless verified.
+
+## Cross-references
+
+- Credential provider and SSH agent policy: `environments.rules.md`
+- Secret handling and security boundaries: `security.rules.md`
+- Machine- and worktree-specific remote facts: `AGENTS.local.md`
+- Executable command classification: `.codex/rules/*.rules`
 
 ## References
 

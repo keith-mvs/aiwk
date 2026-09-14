@@ -12,16 +12,6 @@
 
 Portable policy belongs here. Machine-specific values belong in `AGENTS.local.md` and MUST be established by inspection.
 
-Current host facts available to this rule set are limited:
-
-| Fact | Current evidence | Use |
-| --- | --- | --- |
-| User host OS | `Windows_NT 10.0.26200`, `x86_64` | Treat as a local fact to re-verify, not a portable repository requirement |
-| Primary user shell | PowerShell `7.6.5` | Re-verify before relying on version-sensitive behavior |
-| WSL | Used in the development workflow | Exact distribution and version are `<TBD>` |
-| Secret provider | Proton Pass CLI is required by user policy | CLI installation, version, session, vault, and item identifiers are `<TBD>` |
-| Git, GitHub CLI, SSH, Python, Node, and other tools | Not safely inspectable on the user host from this execution environment | Resolve dynamically; do not invent values |
-
 Do not substitute the artifact-generation sandbox's versions for the user's workstation values.
 
 ## Environment discovery
@@ -87,11 +77,11 @@ Use this order:
 
 Do not select a globally installed interpreter, package manager, or dependency version merely because it is available first on `PATH`.
 
-## Python policy
-
 ## Executable command guardrails
 
 Repository-local `.codex/rules/*.rules` may allow version and discovery commands and prompt on environment or package mutations such as virtualenv creation or dependency installation. Those executable rules do not decide which interpreter, package manager, or environment is correct; that remains governed by the evidence and selection precedence in this file. An executable allow still has to target the correct environment.
+
+## Python policy
 
 ### Project isolation
 
@@ -213,7 +203,7 @@ A tool's documented secure location overrides the generic fallback.
 
 Use the official `pass-cli` interface when installed and authorized.
 
-### References
+### Secret references
 
 Use URI references in this form:
 
@@ -283,6 +273,12 @@ Before reporting an environment-dependent result:
 4. Record the exact command and exit status.
 5. Distinguish local success from cross-platform or CI compatibility.
 6. Remove temporary credentials, files, environments, and diagnostic output.
+
+## Cross-references
+
+- Machine-local facts and authorized exceptions: `AGENTS.local.md`
+- Secret classification and handling boundaries: `security.rules.md`
+- Executable command classification: `.codex/rules/*.rules`
 
 ## References
 

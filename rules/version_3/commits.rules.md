@@ -40,11 +40,11 @@ Record unresolved values in `AGENTS.local.md`; do not invent identity, signing, 
 | COM-004 | The agent MUST preserve unrelated staged and unstaged user changes and MUST NOT use broad staging commands when they could include unrelated files. |
 | COM-005 | The agent MUST NOT create or use a fabricated Git identity, signing key, co-author, issue reference, or attribution. |
 
-## Commit message format
-
 ## Executable command guardrails
 
 Repository-local `.codex/rules/*.rules` may allow read-only Git inspection and prompt for staging, commit, history-rewrite, branch, tag, and cleanup commands. They may forbid destructive forms such as `git reset --hard`, but they do not waive commit-message format, signing, provenance, staging discipline, or rollback requirements in this file.
+
+## Commit message format
 
 Use:
 
@@ -76,7 +76,7 @@ Rules:
 
 ## Atomicity and staging
 
-| ID | Requirement | Verification |
+| ID | Requirement | Observable verification |
 | --- | --- | --- |
 | COM-010 | One commit MUST represent one reviewable logical change. | The commit can be reverted without separating unrelated concerns. |
 | COM-011 | Production code, its required tests, contract/schema updates, generated derivatives, and documentation MUST remain in the same commit when they jointly define one behavior change. | No intermediate committed state violates the intended contract. |
@@ -174,6 +174,13 @@ Before committing:
 8. Create the commit using the configured signing behavior.
 9. Inspect `git show --stat --oneline --decorate HEAD` and, when required, verify the signature.
 10. Report the commit identifier without implying push or publication.
+
+## Cross-references
+
+- Validation execution and evidence before commit: `testing.rules.md`
+- Remote, publication, and force-push authority: `remotes.rules.md`
+- Secret and credential boundaries: `security.rules.md`
+- Executable command classification: `.codex/rules/*.rules`
 
 ## Lineage and migration
 

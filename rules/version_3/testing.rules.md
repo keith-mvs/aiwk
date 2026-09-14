@@ -1,4 +1,14 @@
-# Test and Validation Rules
+---
+title: Test and Validation Rules
+generated_at: 2026-09-14
+policy_version: 3
+status: active
+scope: repository
+rules_root: rules/version_3
+references:
+  - rules/version_3/AGENTS.md
+tags: [testing, validation, rules]
+---
 
 | Field | Value |
 | --- | --- |
@@ -31,8 +41,10 @@ This file applies to unit tests, integration tests, end-to-end tests, regression
 | TST-013 | When a test fails, the agent MUST distinguish pre-existing failures from change-induced failures where evidence permits and MUST inspect the actual failure before modifying tests. | The diagnosis identifies whether code, test, fixture, environment, or assumption is defective. |
 | TST-014 | The agent MUST record validation evidence precisely, including the exact command, execution context when material, exit or result, relevant failed test names, whether the command completed, whether tests were skipped, and any limitations. | The final report uses `passed`, `failed`, `not run`, or `blocked` accurately. |
 | TST-015 | The agent MUST treat validation as complete only when it is proportionate to task scope, behavioral impact, risk, repository conventions, and available runtime. | The final claim matches the actual checks that ran. |
+| TST-016 | The agent MUST validate after mutation and MUST re-validate after correcting a surfaced failure. | Each relevant check has an observed result after the last affected change. |
+| TST-017 | The agent MUST stop blind automated repair after three unsuccessful cycles for the same file and check, then diagnose the cause. | No unbounded formatting, lint, generation, or retry loop occurs. |
 
-## Regression Test Integrity
+## Regression test integrity
 
 Regression tests protect established behavior. A failing `PREEXISTING_TEST` is evidence against the recent code change or its causal implementation until the agent demonstrates otherwise.
 
@@ -104,19 +116,32 @@ Validation commands are classified by effective behavior, not by their label.
 - Wrapped or indirect execution that obscures the effective command fails closed until the underlying action is known.
 - A safe label does not make an unsafe command safe.
 
-## Additional guidance
-
 ## Executable command guardrails
 
 Future `.codex/rules/*.rules` may classify specific test, build, check, and validation prefixes, but only when repository-native manifests, scripts, or CI evidence identify safe exact forms. A command named `test`, `build`, or `check` is not automatically read-only; its effective behavior still decides whether this file's validation policy applies. CI/test semantics remain owned here.
+
+## Additional guidance
 
 - Test filenames remain under `naming.rules.md`; this file owns execution, interpretation, and evidence.
 - When a validation command is also a code-change command, the code-change discipline in `coding.rules.md` still applies.
 - Security-sensitive validation defers to `security.rules.md`; external-target and publication boundaries defer to `remotes.rules.md`.
 
+## Validation and completion
+
+A task is complete only when all applicable conditions hold:
+
+- the intended artifact was created or modified;
+- the artifact is reachable from the applicable entry point;
+- relevant validation ran against the final state and passed;
+- every surfaced task-caused failure was fixed and re-verified or remains explicitly open;
+- affected contracts and documentation agree with implementation;
+- unrelated paths remain unchanged;
+- temporary artifacts are dispositioned;
+- the final report distinguishes `PASS`, `FAIL`, `NOT PERFORMED`, and `<TBD>` accurately.
+
 ## Cross-references
 
-- Broad repository behavior and completion: `general.rules.md`
+- Governing agent contract and precedence: `AGENTS.md`
 - Implementation changes that need validation: `coding.rules.md`
 - Runtime selection, shell policy, and environment isolation: `environments.rules.md`
 - File naming and test filename conventions: `naming.rules.md`
@@ -126,4 +151,4 @@ Future `.codex/rules/*.rules` may classify specific test, build, check, and vali
 
 ## Lineage and migration
 
-This file centralizes test and validation execution behavior so it no longer has to be inferred from general repository policy. The universal `*.test` filename rule was intentionally replaced by framework-native discovery, and this file governs execution and evidence rather than filename syntax.
+This file centralizes test and validation execution behavior so it no longer has to be inferred from general repository policy. Post-mutation re-validation, blind-repair bounds, and task-completion criteria were absorbed from `general.rules.md` during the GEN migration. The universal `*.test` filename rule was intentionally replaced by framework-native discovery, and this file governs execution and evidence rather than filename syntax.
