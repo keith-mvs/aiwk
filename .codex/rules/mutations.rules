@@ -1,0 +1,597 @@
+# Repo-local executable mutation policy.
+# These rules gate state-changing commands that remain subject to the semantic
+# requirements in rules/version-3/*.rules.md.
+
+# ---------------------------------------------------------------------------
+# Git working-tree, index, and history mutations
+# ---------------------------------------------------------------------------
+
+prefix_rule(
+    pattern = ["git", "add"],
+    decision = "prompt",
+    justification = "Staging changes mutates the index and must respect the commit and staging discipline in commits.rules.md.",
+    match = [
+        "git add file.txt",
+        "git add -A",
+        "git add -p",
+    ],
+    not_match = [
+        "git addx",
+        "git status",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", ["rm", "mv"]],
+    decision = "prompt",
+    justification = "Removing or renaming tracked files mutates the worktree and/or index.",
+    match = [
+        "git rm file.txt",
+        "git rm --cached file.txt",
+        "git mv old.txt new.txt",
+    ],
+    not_match = [
+        "git rmx file.txt",
+        "git status",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "commit"],
+    decision = "prompt",
+    justification = "Creating a commit mutates local history and remains subject to commit message, signing, provenance, and staged-content rules.",
+    match = [
+        "git commit -m \"build: add feature\"",
+        "git commit --amend --no-edit",
+        "git commit --allow-empty -m \"maintain: note\"",
+    ],
+    not_match = [
+        "git commitx",
+        "git status",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", ["checkout", "switch", "restore"]],
+    decision = "prompt",
+    justification = "Switching branches or restoring paths can overwrite uncommitted work and change HEAD or the worktree.",
+    match = [
+        "git checkout main",
+        "git switch main",
+        "git restore file.txt",
+    ],
+    not_match = [
+        "git checkoutx main",
+        "git status",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "reset"],
+    decision = "prompt",
+    justification = "Reset moves HEAD and/or index state and must remain under explicit review.",
+    match = [
+        "git reset",
+        "git reset --soft HEAD~1",
+        "git reset --mixed HEAD",
+    ],
+    not_match = [
+        "git resetx",
+        "git status",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", ["rebase", "merge", "cherry-pick", "revert"]],
+    decision = "prompt",
+    justification = "History-rewriting and history-extending commands require review before execution.",
+    match = [
+        "git rebase main",
+        "git merge feature",
+        "git cherry-pick abc1234",
+        "git revert abc1234",
+    ],
+    not_match = [
+        "git rebasex main",
+        "git status",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "stash"],
+    decision = "prompt",
+    justification = "Stash operations mutate the working tree and stash list.",
+    match = [
+        "git stash",
+        "git stash push",
+        "git stash pop",
+    ],
+    not_match = [
+        "git stashx",
+        "git status",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "tag"],
+    decision = "prompt",
+    justification = "Tag creation and inspection are part of release workflow and must remain visible to review.",
+    match = [
+        "git tag",
+        "git tag -a v1.0.0 -m release",
+        "git tag v1.0.0",
+    ],
+    not_match = [
+        "git tagx",
+        "git status",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "clean"],
+    decision = "prompt",
+    justification = "Cleaning untracked files mutates the worktree and should be reviewed before execution.",
+    match = [
+        "git clean",
+        "git clean -fd",
+        "git clean -fx",
+    ],
+    not_match = [
+        "git cleanx",
+        "git status",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "branch", ["-d", "--delete", "-m", "--move", "-c", "--copy", "-u", "--set-upstream-to", "-M", "-C"]],
+    decision = "prompt",
+    justification = "Branch deletion, rename, copy, and upstream changes mutate local refs and require review.",
+    match = [
+        "git branch -d feature",
+        "git branch --delete feature",
+        "git branch -m old new",
+        "git branch -c old copy",
+        "git branch -u origin/main",
+    ],
+    not_match = [
+        "git branch --show-current",
+        "git branchx",
+        "git",
+    ],
+)
+
+# ---------------------------------------------------------------------------
+# Git remote and publication mutations
+# ---------------------------------------------------------------------------
+
+prefix_rule(
+    pattern = ["git", "fetch"],
+    decision = "prompt",
+    justification = "Fetching updates remote-tracking refs and may contact a remote host.",
+    match = [
+        "git fetch",
+        "git fetch --prune",
+        "git fetch origin main",
+    ],
+    not_match = [
+        "git fetchx",
+        "git status",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "pull"],
+    decision = "prompt",
+    justification = "Pull mutates the local repository by integrating remote changes.",
+    match = [
+        "git pull",
+        "git pull --rebase",
+        "git pull --ff-only",
+    ],
+    not_match = [
+        "git pullx",
+        "git status",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "remote", "update"],
+    decision = "prompt",
+    justification = "Remote update mutates remote-tracking refs across configured remotes.",
+    match = [
+        "git remote update",
+        "git remote update --prune",
+    ],
+    not_match = [
+        "git remote updatex",
+        "git status",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "remote", ["add", "rename", "remove", "set-url"]],
+    decision = "prompt",
+    justification = "Remote configuration changes must be reviewed before they alter repository connectivity.",
+    match = [
+        "git remote add origin https://example.com/repo.git",
+        "git remote rename upstream origin",
+        "git remote remove upstream",
+        "git remote set-url origin https://example.com/repo.git",
+    ],
+    not_match = [
+        "git remote -v",
+        "git remote get-url origin",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "push"],
+    decision = "prompt",
+    justification = "Push sends local history to a remote and requires explicit remote authorization in remotes.rules.md.",
+    match = [
+        "git push",
+        "git push origin main",
+        "git push --force-with-lease origin main",
+    ],
+    not_match = [
+        "git pushx",
+        "git status",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["gh", "auth", ["login", "logout", "refresh", "setup-git"]],
+    decision = "prompt",
+    justification = "GitHub CLI auth and credential-session changes must remain under explicit review.",
+    match = [
+        "gh auth login",
+        "gh auth logout",
+        "gh auth refresh",
+        "gh auth setup-git",
+    ],
+    not_match = [
+        "gh auth status --active",
+        "gh auth status --show-token",
+        "gh",
+    ],
+)
+
+prefix_rule(
+    pattern = ["gh", "repo", "create"],
+    decision = "prompt",
+    justification = "Repository creation is an externally visible action that requires explicit authorization.",
+    match = [
+        "gh repo create owner/repo",
+        "gh repo create --private owner/repo",
+    ],
+    not_match = [
+        "gh repo view owner/repo",
+        "gh",
+    ],
+)
+
+prefix_rule(
+    pattern = ["gh", "pr", "create"],
+    decision = "prompt",
+    justification = "Pull request creation is an externally visible action that requires explicit authorization.",
+    match = [
+        "gh pr create",
+        "gh pr create --title \"build: add feature\"",
+    ],
+    not_match = [
+        "gh pr view 123",
+        "gh",
+    ],
+)
+
+prefix_rule(
+    pattern = ["gh", "release", "create"],
+    decision = "prompt",
+    justification = "Release creation is an externally visible publication action that requires explicit authorization.",
+    match = [
+        "gh release create v1.0.0",
+        "gh release create v1.0.0 --notes release",
+    ],
+    not_match = [
+        "gh release view v1.0.0",
+        "gh",
+    ],
+)
+
+# ---------------------------------------------------------------------------
+# Environment and dependency mutations
+# ---------------------------------------------------------------------------
+
+prefix_rule(
+    pattern = [["python", "python3", "py"], "-m", "venv"],
+    decision = "prompt",
+    justification = "Virtual-environment creation mutates the local development environment.",
+    match = [
+        "python -m venv .venv",
+        "python3 -m venv .venv",
+        "py -m venv .venv",
+    ],
+    not_match = [
+        "python --version",
+        "python",
+    ],
+)
+
+prefix_rule(
+    pattern = [["pip", "pip3"], ["install", "uninstall"]],
+    decision = "prompt",
+    justification = "Package installation or removal mutates the active Python environment.",
+    match = [
+        "pip install -r requirements.txt",
+        "pip3 uninstall some-package",
+    ],
+    not_match = [
+        "pip --version",
+        "pip",
+    ],
+)
+
+prefix_rule(
+    pattern = [["python", "python3", "py"], "-m", "pip", ["install", "uninstall"]],
+    decision = "prompt",
+    justification = "Module-based pip installation or removal mutates the active Python environment.",
+    match = [
+        "python -m pip install -r requirements.txt",
+        "python3 -m pip uninstall some-package",
+        "py -m pip install package",
+    ],
+    not_match = [
+        "python -m pip --version",
+        "python",
+    ],
+)
+
+prefix_rule(
+    pattern = ["uv", ["venv", "sync", "add", "remove"]],
+    decision = "prompt",
+    justification = "uv environment and dependency operations mutate the local project environment.",
+    match = [
+        "uv venv",
+        "uv sync",
+        "uv add package",
+        "uv remove package",
+    ],
+    not_match = [
+        "uv --version",
+        "uv",
+    ],
+)
+
+prefix_rule(
+    pattern = ["uv", "pip", ["install", "sync", "uninstall"]],
+    decision = "prompt",
+    justification = "uv pip operations mutate package state in the active environment.",
+    match = [
+        "uv pip install package",
+        "uv pip sync requirements.txt",
+        "uv pip uninstall package",
+    ],
+    not_match = [
+        "uv pip --version",
+        "uv",
+    ],
+)
+
+prefix_rule(
+    pattern = ["conda", ["create", "install", "remove", "update", "upgrade"]],
+    decision = "prompt",
+    justification = "Conda package and environment mutations require explicit review.",
+    match = [
+        "conda create -n demo python=3.12",
+        "conda install numpy",
+        "conda remove numpy",
+    ],
+    not_match = [
+        "conda --version",
+        "conda",
+    ],
+)
+
+prefix_rule(
+    pattern = ["conda", "env", ["create", "update", "remove"]],
+    decision = "prompt",
+    justification = "Conda environment mutations require explicit review.",
+    match = [
+        "conda env create -f environment.yml",
+        "conda env update -f environment.yml",
+        "conda env remove -n demo",
+    ],
+    not_match = [
+        "conda env list",
+        "conda",
+    ],
+)
+
+prefix_rule(
+    pattern = ["poetry", ["install", "add", "remove", "update", "lock"]],
+    decision = "prompt",
+    justification = "Poetry dependency and lockfile operations mutate project state.",
+    match = [
+        "poetry install",
+        "poetry add package",
+        "poetry remove package",
+        "poetry lock",
+    ],
+    not_match = [
+        "poetry --version",
+        "poetry",
+    ],
+)
+
+prefix_rule(
+    pattern = ["npm", ["install", "ci", "uninstall", "update", "i"]],
+    decision = "prompt",
+    justification = "npm dependency operations mutate the local project environment.",
+    match = [
+        "npm install",
+        "npm ci",
+        "npm uninstall package",
+        "npm update",
+        "npm i package",
+    ],
+    not_match = [
+        "npm --version",
+        "npm",
+    ],
+)
+
+# ---------------------------------------------------------------------------
+# Security-sensitive local mutations
+# ---------------------------------------------------------------------------
+
+prefix_rule(
+    pattern = ["pass-cli", ["inject", "logout"]],
+    decision = "prompt",
+    justification = "Secret injection and session termination mutate secret-handling state and require explicit review.",
+    match = [
+        "pass-cli inject config.env",
+        "pass-cli logout",
+    ],
+    not_match = [
+        "pass-cli --version",
+        "pass-cli info",
+    ],
+)
+
+prefix_rule(
+    pattern = ["sudo"],
+    decision = "prompt",
+    justification = "Privilege escalation requires explicit authorization.",
+    match = [
+        "sudo apt-get install curl",
+        "sudo rm -rf /tmp/build",
+    ],
+    not_match = [
+        "whoami",
+        "id",
+        "echo",
+    ],
+)
+
+prefix_rule(
+    pattern = ["chmod"],
+    decision = "prompt",
+    justification = "Changing file permissions requires explicit authorization.",
+    match = [
+        "chmod 600 .env.local",
+        "chmod +x script.sh",
+    ],
+    not_match = [
+        "ls -l script.sh",
+        "stat script.sh",
+        "echo",
+    ],
+)
+
+prefix_rule(
+    pattern = ["chown"],
+    decision = "prompt",
+    justification = "Changing file ownership requires explicit authorization.",
+    match = [
+        "chown user:group file.txt",
+    ],
+    not_match = [
+        "ls -l file.txt",
+        "whoami",
+        "echo",
+    ],
+)
+
+prefix_rule(
+    pattern = ["icacls"],
+    decision = "prompt",
+    justification = "Changing Windows ACLs requires explicit authorization.",
+    match = [
+        "icacls file.txt /grant Users:R",
+    ],
+    not_match = [
+        "Get-ChildItem",
+        "whoami",
+        "echo",
+    ],
+)
+
+prefix_rule(
+    pattern = ["takeown"],
+    decision = "prompt",
+    justification = "Changing Windows file ownership requires explicit authorization.",
+    match = [
+        "takeown /f file.txt",
+    ],
+    not_match = [
+        "Get-ChildItem",
+        "whoami",
+        "echo",
+    ],
+)
+
+prefix_rule(
+    pattern = ["rm"],
+    decision = "prompt",
+    justification = "File and directory deletion is destructive and must be reviewed before execution.",
+    match = [
+        "rm file.txt",
+        "rm -r build",
+        "rm -rf tmp",
+    ],
+    not_match = [
+        "rmdir build",
+        "Get-ChildItem",
+        "git status",
+    ],
+)
+
+prefix_rule(
+    pattern = ["Remove-Item"],
+    decision = "prompt",
+    justification = "PowerShell deletion is destructive and must be reviewed before execution.",
+    match = [
+        "Remove-Item file.txt",
+        "Remove-Item -Recurse -Force build",
+    ],
+    not_match = [
+        "Remove-Itemx file.txt",
+        "Get-ChildItem",
+    ],
+)
+
+# ---------------------------------------------------------------------------
+# Wrapper and indirect execution
+# ---------------------------------------------------------------------------
+
+prefix_rule(
+    pattern = [["bash", "sh", "zsh"], ["-c", "-lc"]],
+    decision = "prompt",
+    justification = "Shell wrappers may conceal the effective command; review the wrapper before allowing execution.",
+    match = [
+        "bash -lc git status && git diff",
+        "bash -lc git add . && git push",
+        "sh -c git status > /tmp/status.txt",
+        "zsh -lc git reset --hard",
+    ],
+    not_match = [
+        "bash",
+        "bash -l",
+        "sh",
+        "zsh",
+    ],
+)

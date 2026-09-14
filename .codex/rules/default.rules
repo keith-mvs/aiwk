@@ -1,0 +1,393 @@
+# Repo-local executable baseline.
+# These rules classify narrow read-only discovery commands only.
+# Semantic authority remains in rules/version-3/*.rules.md.
+
+prefix_rule(
+    pattern = ["git", "rev-parse"],
+    decision = "allow",
+    justification = "Read-only Git revision and repository discovery.",
+    match = [
+        "git rev-parse --show-toplevel",
+        "git rev-parse HEAD",
+    ],
+    not_match = [
+        "git rev-parsex",
+        "git status",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "status"],
+    decision = "allow",
+    justification = "Read-only working-tree and index inspection.",
+    match = [
+        "git status",
+        "git status --short --branch",
+    ],
+    not_match = [
+        "git statusx",
+        "git commit",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "diff"],
+    decision = "allow",
+    justification = "Read-only comparison of the working tree, index, and commits.",
+    match = [
+        "git diff",
+        "git diff --cached",
+        "git diff --staged",
+    ],
+    not_match = [
+        "git diffx",
+        "git commit",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "log"],
+    decision = "allow",
+    justification = "Read-only Git history inspection.",
+    match = [
+        "git log",
+        "git log -1",
+        "git log --oneline",
+    ],
+    not_match = [
+        "git logx",
+        "git status",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "show"],
+    decision = "allow",
+    justification = "Read-only display of Git objects and commits.",
+    match = [
+        "git show",
+        "git show HEAD",
+        "git show --stat HEAD",
+    ],
+    not_match = [
+        "git showx",
+        "git status",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "ls-files"],
+    decision = "allow",
+    justification = "Read-only list of files tracked by Git.",
+    match = [
+        "git ls-files",
+        "git ls-files -m",
+        "git ls-files --stage",
+    ],
+    not_match = [
+        "git ls-filesx",
+        "git status",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "branch", "--show-current"],
+    decision = "allow",
+    justification = "Read-only current-branch inspection.",
+    match = [
+        "git branch --show-current",
+    ],
+    not_match = [
+        "git branch -d main",
+        "git branch",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "remote", "-v"],
+    decision = "allow",
+    justification = "Read-only remote URL inspection.",
+    match = [
+        "git remote -v",
+    ],
+    not_match = [
+        "git remote add origin https://example.com/repo.git",
+        "git remote",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "remote", "get-url"],
+    decision = "allow",
+    justification = "Read-only remote URL inspection.",
+    match = [
+        "git remote get-url origin",
+        "git remote get-url --all origin",
+        "git remote get-url --push origin",
+    ],
+    not_match = [
+        "git remote add origin https://example.com/repo.git",
+        "git remote",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "config", "--get"],
+    decision = "allow",
+    justification = "Read-only Git configuration lookup.",
+    match = [
+        "git config --get user.name",
+        "git config --get credential.helper",
+    ],
+    not_match = [
+        "git config user.name value",
+        "git config --unset user.name",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "config", "--get-regexp"],
+    decision = "allow",
+    justification = "Read-only Git configuration lookup by regular expression.",
+    match = [
+        "git config --get-regexp ^remote\\..*\\.(url|pushurl)$",
+        "git config --get-regexp ^user\\.",
+    ],
+    not_match = [
+        "git config --add user.name value",
+        "git config --unset user.name",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "--version"],
+    decision = "allow",
+    justification = "Read-only Git version discovery.",
+    match = [
+        "git --version",
+    ],
+    not_match = [
+        "git status",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["gh", "--version"],
+    decision = "allow",
+    justification = "Read-only GitHub CLI version discovery.",
+    match = [
+        "gh --version",
+    ],
+    not_match = [
+        "gh repo create owner/repo",
+        "gh",
+    ],
+)
+
+prefix_rule(
+    pattern = ["gh", "auth", "status", "--active"],
+    decision = "allow",
+    justification = "Read-only active-account inspection for the GitHub CLI.",
+    match = [
+        "gh auth status --active",
+    ],
+    not_match = [
+        "gh auth status --show-token",
+        "gh auth login",
+        "gh",
+    ],
+)
+
+prefix_rule(
+    pattern = ["ssh", "-V"],
+    decision = "allow",
+    justification = "Read-only SSH client version discovery.",
+    match = [
+        "ssh -V",
+    ],
+    not_match = [
+        "ssh -o StrictHostKeyChecking=no host",
+        "ssh",
+    ],
+)
+
+prefix_rule(
+    pattern = ["python", "--version"],
+    decision = "allow",
+    justification = "Read-only Python version discovery.",
+    match = [
+        "python --version",
+    ],
+    not_match = [
+        "python -m venv .venv",
+        "python",
+    ],
+)
+
+prefix_rule(
+    pattern = ["python3", "--version"],
+    decision = "allow",
+    justification = "Read-only Python 3 version discovery.",
+    match = [
+        "python3 --version",
+    ],
+    not_match = [
+        "python3 -m venv .venv",
+        "python3",
+    ],
+)
+
+prefix_rule(
+    pattern = ["node", "--version"],
+    decision = "allow",
+    justification = "Read-only Node.js version discovery.",
+    match = [
+        "node --version",
+    ],
+    not_match = [
+        "node script.js",
+        "node",
+    ],
+)
+
+prefix_rule(
+    pattern = ["npm", "--version"],
+    decision = "allow",
+    justification = "Read-only npm version discovery.",
+    match = [
+        "npm --version",
+    ],
+    not_match = [
+        "npm install",
+        "npm",
+    ],
+)
+
+prefix_rule(
+    pattern = ["cargo", "--version"],
+    decision = "allow",
+    justification = "Read-only Cargo version discovery.",
+    match = [
+        "cargo --version",
+    ],
+    not_match = [
+        "cargo install",
+        "cargo",
+    ],
+)
+
+prefix_rule(
+    pattern = ["uv", "--version"],
+    decision = "allow",
+    justification = "Read-only uv version discovery.",
+    match = [
+        "uv --version",
+    ],
+    not_match = [
+        "uv sync",
+        "uv",
+    ],
+)
+
+prefix_rule(
+    pattern = ["conda", "--version"],
+    decision = "allow",
+    justification = "Read-only Conda version discovery.",
+    match = [
+        "conda --version",
+    ],
+    not_match = [
+        "conda create -n demo python=3.12",
+        "conda",
+    ],
+)
+
+prefix_rule(
+    pattern = ["poetry", "--version"],
+    decision = "allow",
+    justification = "Read-only Poetry version discovery.",
+    match = [
+        "poetry --version",
+    ],
+    not_match = [
+        "poetry install",
+        "poetry",
+    ],
+)
+
+prefix_rule(
+    pattern = ["dotnet", "--info"],
+    decision = "allow",
+    justification = "Read-only .NET SDK and runtime discovery.",
+    match = [
+        "dotnet --info",
+    ],
+    not_match = [
+        "dotnet build",
+        "dotnet",
+    ],
+)
+
+prefix_rule(
+    pattern = ["go", "version"],
+    decision = "allow",
+    justification = "Read-only Go version discovery.",
+    match = [
+        "go version",
+    ],
+    not_match = [
+        "go test ./...",
+        "go",
+    ],
+)
+
+prefix_rule(
+    pattern = ["rustc", "--version"],
+    decision = "allow",
+    justification = "Read-only Rust compiler version discovery.",
+    match = [
+        "rustc --version",
+    ],
+    not_match = [
+        "rustc --help",
+        "rustc",
+    ],
+)
+
+prefix_rule(
+    pattern = ["pass-cli", "--version"],
+    decision = "allow",
+    justification = "Read-only Proton Pass CLI version discovery.",
+    match = [
+        "pass-cli --version",
+    ],
+    not_match = [
+        "pass-cli inject",
+        "pass-cli",
+    ],
+)
+
+prefix_rule(
+    pattern = ["pass-cli", "info"],
+    decision = "allow",
+    justification = "Read-only Proton Pass session discovery.",
+    match = [
+        "pass-cli info",
+    ],
+    not_match = [
+        "pass-cli inject",
+        "pass-cli",
+    ],
+)

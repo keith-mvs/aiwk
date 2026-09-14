@@ -1,0 +1,239 @@
+# Repo-local executable danger policy.
+# These rules fail closed for destructive or security-bypassing command
+# prefixes that the semantic policy treats as prohibited by default.
+
+prefix_rule(
+    pattern = ["git", "reset", "--hard"],
+    decision = "forbidden",
+    justification = "Hard reset discards worktree and index changes and can rewrite local history destructively.",
+    match = [
+        "git reset --hard",
+        "git reset --hard HEAD~1",
+    ],
+    not_match = [
+        "git reset --soft HEAD~1",
+        "git reset",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "branch", "-D"],
+    decision = "forbidden",
+    justification = "Force-deleting a branch can discard unmerged work and should not execute silently.",
+    match = [
+        "git branch -D feature",
+        "git branch -D -- feature",
+    ],
+    not_match = [
+        "git branch -d feature",
+        "git branch",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "clean", "-fdx"],
+    decision = "forbidden",
+    justification = "The -fdx cleanup form deletes untracked and ignored files aggressively and must be blocked by default.",
+    match = [
+        "git clean -fdx",
+    ],
+    not_match = [
+        "git clean -fd",
+        "git clean",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "push", ["--force", "-f"]],
+    decision = "forbidden",
+    justification = "Force push can overwrite remote history and lose other people's work.",
+    match = [
+        "git push --force",
+        "git push -f",
+        "git push --force origin main",
+        "git push -f origin main",
+    ],
+    not_match = [
+        "git push",
+        "git push --force-with-lease",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "tag", ["-d", "--delete", "-f", "--force"]],
+    decision = "forbidden",
+    justification = "Deleting or forcing a tag rewrites release history and must not execute silently.",
+    match = [
+        "git tag -d v1.0.0",
+        "git tag --delete v1.0.0",
+        "git tag -f v1.0.0",
+        "git tag --force v1.0.0",
+    ],
+    not_match = [
+        "git tag",
+        "git tag -a v1.0.0",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "clean", ["-fd", "-fr", "-rf", "-R"], ["/", "/*"]],
+    decision = "forbidden",
+    justification = "Recursive deletion of the root filesystem is catastrophic and must be blocked.",
+    match = [
+        "git clean -fd /",
+        "git clean -rf /*",
+    ],
+    not_match = [
+        "git clean -fd build",
+        "git clean",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "clean", ["-fd", "-fr", "-rf", "-R"], "--", ["/", "/*"]],
+    decision = "forbidden",
+    justification = "The '--' separator does not make root deletion safe.",
+    match = [
+        "git clean -fd -- /",
+        "git clean -rf -- /*",
+    ],
+    not_match = [
+        "git clean -fd build",
+        "git clean",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "clean", "--no-preserve-root", ["-fd", "-fr", "-rf", "-R"], ["/", "/*"]],
+    decision = "forbidden",
+    justification = "Root deletion with --no-preserve-root is catastrophic and must be blocked.",
+    match = [
+        "git clean --no-preserve-root -fd /",
+        "git clean --no-preserve-root -rf /*",
+    ],
+    not_match = [
+        "git clean --no-preserve-root -fd build",
+        "git clean",
+        "git",
+    ],
+)
+
+prefix_rule(
+    pattern = ["rm", ["-rf", "-fr", "-r", "-R"], ["/", "/*"]],
+    decision = "forbidden",
+    justification = "Recursive deletion of the root filesystem is catastrophic and must be blocked.",
+    match = [
+        "rm -rf /",
+        "rm -fr /",
+        "rm -r /",
+        "rm -rf /*",
+        "rm -r /*",
+    ],
+    not_match = [
+        "rm -rf build",
+        "rm file.txt",
+        "rm",
+    ],
+)
+
+prefix_rule(
+    pattern = ["rm", ["-rf", "-fr", "-r", "-R"], "--", ["/", "/*"]],
+    decision = "forbidden",
+    justification = "The '--' separator does not make root deletion safe.",
+    match = [
+        "rm -rf -- /",
+        "rm -r -- /*",
+    ],
+    not_match = [
+        "rm -rf build",
+        "rm",
+    ],
+)
+
+prefix_rule(
+    pattern = ["rm", "--no-preserve-root", ["-rf", "-fr", "-r", "-R"], ["/", "/*"]],
+    decision = "forbidden",
+    justification = "Root deletion with --no-preserve-root is catastrophic and must be blocked.",
+    match = [
+        "rm --no-preserve-root -rf /",
+        "rm --no-preserve-root -r /*",
+    ],
+    not_match = [
+        "rm --no-preserve-root -rf build",
+        "rm",
+    ],
+)
+
+prefix_rule(
+    pattern = ["tmux", "send-keys"],
+    decision = "forbidden",
+    justification = "Sending keystrokes to tmux panes can drive arbitrary commands in a live session.",
+    match = [
+        "tmux send-keys Enter",
+        "tmux send-keys -t 0 ls",
+    ],
+    not_match = [
+        "tmux list-sessions",
+        "tmux",
+    ],
+)
+
+prefix_rule(
+    pattern = ["gh", "auth", "status", "--show-token"],
+    decision = "forbidden",
+    justification = "Displaying auth tokens or credentials is prohibited.",
+    match = [
+        "gh auth status --show-token",
+    ],
+    not_match = [
+        "gh auth status --active",
+        "gh auth login",
+        "gh",
+    ],
+)
+
+prefix_rule(
+    pattern = ["gh", "auth", "token"],
+    decision = "forbidden",
+    justification = "Printing an authentication token is prohibited.",
+    match = [
+        "gh auth token",
+    ],
+    not_match = [
+        "gh auth status --active",
+        "gh",
+    ],
+)
+
+prefix_rule(
+    pattern = ["ssh", "-o", "StrictHostKeyChecking=no"],
+    decision = "forbidden",
+    justification = "Disabling SSH host-key checking bypasses a security control.",
+    match = [
+        "ssh -o StrictHostKeyChecking=no host",
+    ],
+    not_match = [
+        "ssh -V",
+        "ssh",
+    ],
+)
+
+prefix_rule(
+    pattern = ["ssh", "-o", "UserKnownHostsFile=/dev/null"],
+    decision = "forbidden",
+    justification = "Redirecting known_hosts to /dev/null bypasses SSH host-key trust.",
+    match = [
+        "ssh -o UserKnownHostsFile=/dev/null host",
+    ],
+    not_match = [
+        "ssh -V",
+        "ssh",
+    ],
+)
