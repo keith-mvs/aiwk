@@ -1,0 +1,60 @@
+schema_version: 1
+corpus_id: reusable-software-engineering-prompts
+entrypoint: INDEX.md
+source_map: SOURCE_MAP.md
+stage_vocabulary:
+  - discover
+  - inspect
+  - analyze
+  - plan
+  - execute
+  - validate
+  - report
+  - publish
+authority_levels:
+  read-only: No repository or remote mutation.
+  bounded-mutation: Task-owned repository changes only; no Git staging, commit, or remote mutation.
+  local-git-mutation: Explicitly bounded local Git mutation; no remote mutation.
+  remote-mutation: Explicitly authorized mutation of a verified remote target.
+routing:
+  tie_break_order:
+    - exact purpose match
+    - narrowest scope
+    - least authority
+    - fewest stages
+    - lexicographic id
+  no_implicit_authority_escalation: true
+prompts:
+  - {id: repo.discover-context, path: repository/discover-context.prompt, category: repository, stage: discover, authority_level: read-only}
+  - {id: repo.audit-structure, path: repository/audit-structure.prompt, category: repository, stage: inspect, authority_level: read-only}
+  - {id: repo.analyze-codebase, path: analysis/analyze-codebase.prompt, category: analysis, stage: analyze, authority_level: read-only}
+  - {id: repo.compare-artifacts, path: analysis/compare-artifacts.prompt, category: analysis, stage: analyze, authority_level: read-only}
+  - {id: repo.assess-architecture, path: analysis/assess-architecture.prompt, category: analysis, stage: analyze, authority_level: read-only}
+  - {id: repo.review-code-change, path: analysis/review-code-change.prompt, category: analysis, stage: inspect, authority_level: read-only}
+  - {id: repo.diagnose-root-cause, path: debugging/diagnose-root-cause.prompt, category: debugging, stage: analyze, authority_level: read-only}
+  - {id: repo.remediate-defect, path: debugging/remediate-defect.prompt, category: debugging, stage: execute, authority_level: bounded-mutation}
+  - {id: repo.implement-change, path: implementation/implement-change.prompt, category: implementation, stage: execute, authority_level: bounded-mutation}
+  - {id: repo.refactor-code, path: implementation/refactor-code.prompt, category: implementation, stage: execute, authority_level: bounded-mutation}
+  - {id: repo.migrate-artifacts, path: implementation/migrate-artifacts.prompt, category: implementation, stage: plan, authority_level: bounded-mutation}
+  - {id: repo.change-configuration, path: implementation/change-configuration.prompt, category: implementation, stage: execute, authority_level: bounded-mutation}
+  - {id: repo.manage-dependency, path: dependencies/manage-dependency.prompt, category: dependencies, stage: analyze, authority_level: bounded-mutation}
+  - {id: repo.add-regression-coverage, path: testing/add-regression-coverage.prompt, category: testing, stage: execute, authority_level: bounded-mutation}
+  - {id: repo.validate-change, path: testing/validate-change.prompt, category: testing, stage: validate, authority_level: read-only}
+  - {id: repo.manage-worktree, path: git/manage-worktree.prompt, category: git, stage: inspect, authority_level: local-git-mutation}
+  - {id: repo.create-commit, path: git/create-commit.prompt, category: git, stage: execute, authority_level: local-git-mutation}
+  - {id: repo.publish-remote-changes, path: git/publish-remote-changes.prompt, category: git, stage: publish, authority_level: remote-mutation}
+  - {id: repo.assess-release-readiness, path: release/assess-release-readiness.prompt, category: release, stage: validate, authority_level: read-only}
+  - {id: repo.publish-release, path: release/publish-release.prompt, category: release, stage: publish, authority_level: remote-mutation}
+  - {id: repo.update-documentation, path: documentation/update-documentation.prompt, category: documentation, stage: execute, authority_level: bounded-mutation}
+  - {id: repo.maintain-changelog, path: documentation/maintain-changelog.prompt, category: documentation, stage: execute, authority_level: bounded-mutation}
+  - {id: repo.engineer-policy, path: governance/engineer-repository-policy.prompt, category: governance, stage: analyze, authority_level: bounded-mutation}
+  - {id: repo.maintain-work-items, path: governance/maintain-work-items.prompt, category: governance, stage: analyze, authority_level: bounded-mutation}
+  - {id: repo.engineer-agent-skill, path: governance/engineer-agent-skill.prompt, category: governance, stage: plan, authority_level: bounded-mutation}
+  - {id: prompt.compile-task, path: prompts/compile-task-prompt.prompt, category: prompts, stage: analyze, authority_level: read-only}
+  - {id: prompt.maintain-corpus, path: prompts/maintain-prompt-corpus.prompt, category: prompts, stage: analyze, authority_level: bounded-mutation}
+  - {id: repo.review-security, path: security/review-security.prompt, category: security, stage: analyze, authority_level: read-only}
+  - {id: repo.clean-repository, path: maintenance/clean-repository.prompt, category: maintenance, stage: analyze, authority_level: bounded-mutation}
+  - {id: repo.investigate-performance, path: performance/investigate-performance.prompt, category: performance, stage: analyze, authority_level: bounded-mutation}
+  - {id: repo.execute-work-item, path: workflow/execute-work-item.prompt, category: workflow, stage: discover, authority_level: bounded-mutation}
+  - {id: research.source-grounded-analysis, path: research/source-grounded-analysis.prompt, category: research, stage: discover, authority_level: read-only}
+
