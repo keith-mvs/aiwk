@@ -1,12 +1,15 @@
-# Commit Rules
-
-| Field | Value |
-| --- | --- |
-| Version | 3 |
-| Status | Active |
-| Scope | Git commits and local history |
-| Rule namespace | `COM` |
-| Change field | `policy_version: 3` |
+---
+title: Commit Rules
+generated_at: 2026-09-14
+policy_version: 3
+status: active
+scope: repository
+rules_root: .
+tracking: tracked
+references:
+  - AGENTS.md
+tags: [commits, git, rules]
+---
 
 ## Evidence before policy application
 

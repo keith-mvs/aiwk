@@ -1,12 +1,15 @@
-# Development Environment Rules
-
-| Field | Value |
-| --- | --- |
-| Version | 3 |
-| Status | Active |
-| Scope | Runtime and development environments |
-| Rule namespace | `ENV` |
-| Change field | `policy_version: 3` |
+---
+title: Development Environment Rules
+generated_at: 2026-09-14
+policy_version: 3
+status: active
+scope: repository
+rules_root: .
+tracking: tracked
+references:
+  - AGENTS.md
+tags: [environments, runtimes, rules]
+---
 
 ## Evidence model
 

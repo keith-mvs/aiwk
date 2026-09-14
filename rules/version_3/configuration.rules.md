@@ -4,19 +4,12 @@ generated_at: 2026-09-14
 policy_version: 3
 status: active
 scope: repository
-rules_root: rules/version_3
+rules_root: .
+tracking: tracked
 references:
-  - rules/version_3/AGENTS.md
+  - AGENTS.md
 tags: [configuration, placement, rules]
 ---
-
-| Field | Value |
-| --- | --- |
-| Version | 3 |
-| Status | Active |
-| Scope | Repository configuration, hierarchy, and artifact placement |
-| Rule namespace | `CFG` |
-| Change field | `policy_version: 3` |
 
 ## Governing principle
 

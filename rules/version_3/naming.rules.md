@@ -1,12 +1,15 @@
-# Naming Rules
-
-| Field | Value |
-| --- | --- |
-| Version | 3 |
-| Status | Active |
-| Scope | Repository-controlled filenames, directories, identifiers, and versioned artifacts |
-| Rule namespace | `NAM` |
-| Change field | `policy_version: 3` |
+---
+title: Naming Rules
+generated_at: 2026-09-14
+policy_version: 3
+status: active
+scope: repository
+rules_root: .
+tracking: tracked
+references:
+  - AGENTS.md
+tags: [naming, files, rules]
+---
 
 ## Formal filename model
 

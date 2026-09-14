@@ -1,12 +1,15 @@
-# Skill Discovery and Invocation Rules
-
-| Field | Value |
-| --- | --- |
-| Version | 3 |
-| Status | Active |
-| Scope | Agent Skill discovery, selection, loading, composition, execution, and verification |
-| Rule namespace | `SKL` |
-| Change field | `policy_version: 3` |
+---
+title: Skill Discovery and Invocation Rules
+generated_at: 2026-09-14
+policy_version: 3
+status: active
+scope: repository
+rules_root: .
+tracking: tracked
+references:
+  - AGENTS.md
+tags: [skills, agents, rules]
+---
 
 ## Objective
 
@@ -60,11 +63,11 @@ When a matching Skill is selected:
 2. Read the entrypoint before applying the Skill.
 3. Prefer symbolic/runtime paths such as:
 
-```text
-skills://<skill-name>/skill.md
-```
+   ```text
+   skills://<skill-name>/skill.md
+   ```
 
-when the platform exposes them.
+   when the platform exposes them.
 4. For filesystem Agent Skills, use the platform-discovered package and its canonical `SKILL.md`; do not guess a mount path.
 5. Read only the referenced modules/resources needed for the task.
 6. Follow declared dependency ordering and stop conditions.

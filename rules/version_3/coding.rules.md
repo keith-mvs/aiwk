@@ -4,23 +4,16 @@ generated_at: 2026-09-14
 policy_version: 3
 status: active
 scope: repository
-rules_root: rules/version_3
+rules_root: .
+tracking: tracked
 references:
-  - rules/version_3/AGENTS.md
+  - AGENTS.md
 tags: [coding, implementation, rules]
 ---
 
-| Field | Value |
-| --- | --- |
-| Version | 3 |
-| Status | Active |
-| Scope | Implementation, code changes, and code-adjacent edits |
-| Rule namespace | `COD` |
-| Change field | `policy_version: 3` |
-
 ## Applicability
 
-This file applies to new code, bug fixes, refactoring, API changes, configuration-backed code changes, generated-code interaction, dependency-driven edits, and scripts that function as software.
+This file applies to new code, bug fixes, refactoring, API changes, configuration-backed code changes, generated-code interaction, dependency-driven edits, and scripts that function as software. It also carries the portable coding conventions—formatting precedence, whitespace, indentation, file hygiene, layout, naming, comments, imports, control flow, error handling, and tool protocol—that govern how such changes are written.
 
 ## Core rules
 
@@ -56,6 +49,217 @@ For every material change:
 
 Passing unit tests are a signal, not a complete change-impact analysis.
 
+## Formatting and style precedence
+
+Source formatting follows the strongest applicable convention, not a generic house style. Resolve style questions in this order:
+
+1. Language syntax and semantic requirements.
+2. The language specification or official style guidance where applicable.
+3. Canonical formatter behavior for the ecosystem.
+4. Repository-local formatter and linter configuration, including `.editorconfig` or equivalent.
+5. The requirements in this file.
+6. The established local style of the affected file.
+
+Where two applicable rules conflict, preserve semantics first and follow the higher-authority requirement. Do not override canonical formatter output merely to satisfy generic aesthetic preferences, and do not impose one universal formatting convention where a language, formatter, specification, or established repository convention requires different behavior.
+
+Formatting expectations SHOULD be machine-enforceable where practical: prefer formatter configuration, `.editorconfig`, language-native formatter settings, lint rules, pre-commit validation, or CI checks over prose-only requirements when the repository supports such mechanisms. This file defines expectations; it does not assert that corresponding automation exists or passes. These conventions are repository-portable: they name the repository root, the applicable formatter configuration, and the affected source file semantically rather than by fixed paths.
+
+## Formatter and linter protocol
+
+- Run the narrowest formatter applicable to the modified source; do not format unrelated files.
+- Do not manually undo canonical formatter output without a documented reason.
+- Formatter success is not proof of semantic correctness; a clean lint result is not proof of correct behavior.
+- Address linter findings caused by the change when they are within task scope.
+- Do not perform unrelated repository-wide remediation unless requested.
+- Do not suppress a finding merely to make validation pass without understanding the underlying condition.
+
+## Whitespace
+
+### Horizontal whitespace
+
+- Do not leave incidental trailing whitespace; preserve it only when the file format gives it defined semantic meaning.
+- Prefer formatter-controlled spacing around operators, delimiters, keywords, declarations, and expressions.
+- Do not use whitespace for visual alignment that canonical tooling would remove or destabilize, and do not use repeated spaces to simulate tables or columns in ordinary source.
+- Avoid whitespace-only churn unrelated to the task.
+- Preserve semantic whitespace inside literals, fixed-format records, protocol payloads, and other formats where whitespace affects behavior or rendering.
+- In Markdown, do not blindly strip an intentional CommonMark hard break; prefer an unambiguous alternative such as a trailing backslash or an explicit `<br>` where practical.
+
+### Blank lines
+
+- Use blank lines to separate logical units, not as decoration, and avoid repeated runs of unnecessary blank lines.
+- Follow the language-specific formatter for spacing between declarations, types, functions, methods, imports, and major logical blocks.
+- Do not insert blank lines that fragment tightly related statements without improving readability, and do not remove required or formatter-generated blank lines.
+
+### Line endings and final newline
+
+Unless a stronger file-format requirement applies:
+
+- Text files MUST end with exactly one newline.
+- Use `LF` (`\n`) as the repository-neutral line-ending default.
+- Do not introduce mixed line endings within a file.
+- Preserve a required platform-specific or generated-file convention where repository evidence establishes one.
+- Do not normalize line endings across unrelated files inside an otherwise scoped change.
+
+## Indentation and tabs
+
+### Default indentation
+
+Unless a language, file format, formatter, generated artifact, or existing governing repository convention requires otherwise:
+
+- Indent with spaces.
+- Use one consistent indentation width per file type, selected by ecosystem or formatter convention; do not mandate one universal width across ecosystems with different canonical conventions.
+- Never mix tabs and spaces for indentation within the same syntactic context.
+- Never use tabs to align comments, assignments, tables, or arbitrary columns.
+
+### Required tabs
+
+Tabs are permitted or required only when one of the following applies:
+
+1. The language or file format requires them.
+2. The canonical formatter emits them.
+3. An authoritative project-local configuration requires them.
+4. Changing them would alter semantics.
+5. The file is generated and must preserve generator output.
+
+Do not convert required tabs into spaces. Known semantic cases include recipe command indentation in traditional Makefiles—required unless the file deliberately changes the recipe prefix—and Go source, which defers to `gofmt` including its indentation behavior.
+
+### Mixed indentation
+
+Mixed indentation that is not language-required or formatter-produced MUST be treated as a formatting defect.
+
+- Correct mixed indentation in the lines or logical region being edited.
+- Do not perform repository-wide whitespace rewrites unless the task explicitly calls for normalization.
+- Preserve semantic whitespace.
+
+### Display width versus storage
+
+Distinguish the indentation characters stored in the file from the tab display width configured in an editor. Editor display width MUST NOT be treated as evidence that tab characters are permitted in source.
+
+## File hygiene
+
+Portable baseline, suitable for `.editorconfig` or equivalent tooling:
+
+- `UTF-8` for ordinary text source files unless another encoding is required; do not insert a BOM unless a language, platform, or toolchain requires it.
+- `LF` line endings, exactly one final newline, and no incidental trailing whitespace, per the whitespace rules above.
+- Indentation style defined per language and file type rather than assumed globally where canonical conventions differ.
+
+The byte-level encoding, line-ending, and whitespace protocol is owned by `configuration.rules.md`; this section states the source-editing baseline only. Do not modify binary, generated, vendored, minified, lock, snapshot, fixture, or other machine-produced artifacts merely to satisfy generic source-formatting rules unless those artifacts are explicitly in scope.
+
+## Generated and third-party content
+
+Generated, vendored, externally mirrored, minified, and machine-maintained files MUST NOT be manually reformatted unless the generating process is also updated appropriately, repository policy explicitly permits the modification, or the task explicitly requires it. Prefer regenerating a generated file from its source over hand-editing the output. Generated-file ownership follows COD-008 and the generated-content rules in `configuration.rules.md`.
+
+## Source layout
+
+- Keep related code together and keep each unit focused on one coherent responsibility.
+- Prefer shallow, readable control flow over avoidable nesting; use early returns or guard clauses where they improve clarity and fit language conventions.
+- Avoid deeply nested conditional structures where a clearer decomposition exists, and avoid excessively long functions or methods when cohesive extraction improves comprehension.
+- Do not apply arbitrary numeric limits on function, method, or file length without a repository-specific requirement, and do not split cohesive logic solely to satisfy a metric.
+- Do not convert subjective design preferences into unconditional rules where context determines correctness.
+
+## Naming
+
+- Defer first to language and ecosystem naming standards; `naming.rules.md` governs filenames and repository-controlled identifiers.
+- Use names that communicate role or intent; avoid cryptic abbreviations except conventional domain terms or very local, obvious variables.
+- Do not encode type information redundantly into names unless an established ecosystem convention requires it.
+- Keep terminology consistent with the domain model and public interfaces.
+- Preserve externally defined names, serialized fields, API contracts, protocol identifiers, database schema names, and interoperability constraints.
+- Do not rename public or externally observable identifiers solely for stylistic consistency.
+
+## Comments and documentation
+
+Write comments for what the code alone does not communicate: rationale, non-obvious constraints, invariants, safety assumptions, compatibility requirements, externally imposed behavior, and intentional deviations from expected patterns.
+
+- Do not write comments that merely restate the code, and do not require comments for every declaration, variable, branch, or obvious operation.
+- Update or remove a stale comment when the associated behavior changes.
+- Public API documentation SHOULD follow the documentation convention of the language or framework when applicable.
+
+## Imports and dependencies
+
+- Use language-standard import/include ordering or the canonical formatter's behavior; do not maintain manual orderings that conflict with canonical tooling.
+- Remove unused imports when safe.
+- Avoid wildcard imports except where ecosystem conventions or framework behavior justify them.
+- Keep dependency declarations minimal and explicit; do not introduce a dependency solely to perform a trivial operation already supported adequately by the standard library or existing project dependencies without a documented reason, per COD-009.
+
+## Delimiters and expression style
+
+- Do not impose a single cross-language brace or delimiter style; follow canonical language formatting.
+- Use explicit grouping where it materially improves correctness or readability.
+- Avoid clever compression that obscures control flow, and do not combine unrelated statements solely to reduce line count.
+- Do not fight formatter output to enforce a preferred brace placement.
+
+## Line length
+
+No universal hard line-length limit applies unless repository policy defines one.
+
+- Follow language and ecosystem conventions where established; readability is the primary objective.
+- Wrap prose, expressions, signatures, and data structures using canonical formatter behavior where available.
+- Permit justified exceptions for URLs, generated identifiers, serialized values, regular expressions, commands, tables, or content whose splitting would reduce clarity or alter semantics.
+- Preserve an existing repository-specified numeric maximum unless a task explicitly reconsiders it.
+
+## Control flow and expressions
+
+- Prefer readable boolean expressions over unnecessarily clever formulations.
+- Avoid assignments or hidden side effects inside conditions unless they are idiomatic and clear in the language.
+- Keep error and exceptional paths explicit according to language norms rather than disguising them in conditionals.
+
+## Error handling
+
+- Propagate, handle, transform, or deliberately ignore each error with an explicit rationale; do not swallow failures silently or leave empty catch, except, or error handlers unless the ignored condition is intentional and documented.
+- Give error messages useful context without exposing secrets or other sensitive data.
+- Keep cleanup reliable on failure paths; pair resource acquisition with release using language-native mechanisms where available.
+- Avoid broad exception capture unless the boundary genuinely requires it.
+- Do not treat an error-handling pattern as universally safe independent of runtime and language semantics.
+
+## Constants and magic values
+
+- Give meaningful names to repeated or domain-significant constants; preserve literals where they are clearer than indirection.
+- Do not replace every literal with a named constant mechanically.
+- Include units in names or types where ambiguity would otherwise exist, and prefer typed representations for units, states, and constrained values where the language supports them and the cost is proportionate.
+
+## Dead code and suppressions
+
+- Remove unreachable or obsolete code instead of commenting it out; prior versions remain available from version control.
+- Do not leave debug output, temporary instrumentation, placeholder branches, or abandoned feature flags without an explicit reason.
+- Keep lint and compiler suppressions narrowly scoped and record a rationale for non-obvious suppressions.
+- Do not disable an entire rule category to silence a local problem when a narrower correction exists.
+
+## Change hygiene
+
+- Minimize unrelated formatting churn and preserve surrounding style unless normalization is explicitly requested.
+- Keep diffs reviewable; separate mechanical formatting from behavioral changes when practical.
+- Avoid opportunistic renaming or restructuring outside task scope.
+- Preserve public behavior unless behavioral modification is part of the requested task.
+
+## Security-relevant practices
+
+Baseline expectations consistent with secure coding practice; `security.rules.md` remains the governing security policy:
+
+- Validate untrusted input at the appropriate trust boundary and prefer allow-list or structurally constrained validation where applicable.
+- Use safe APIs and parameterized interfaces instead of constructing executable commands or queries through unsafe string concatenation.
+- Do not embed credentials, secrets, private keys, access tokens, or environment-specific sensitive values in source.
+- Apply least privilege appropriate to the execution context and fail in a controlled manner.
+- Do not log secrets or unnecessary sensitive data; use language-appropriate resource management and secure temporary-file and filesystem patterns.
+- Preserve output encoding or escaping appropriate to the destination context, and distinguish validation from sanitization and output encoding.
+- Do not infer that clean formatting makes code secure; these rules do not establish compliance, certification, or complete security.
+
+## Language-specific overrides
+
+When this document's generic conventions conflict with a language specification, semantic file-format requirement, canonical formatter, or repository-approved language-specific rule, the language-specific requirement takes precedence unless a higher-authority repository requirement explicitly states otherwise.
+
+Representative deferrals:
+
+- Go: defer formatting to `gofmt`, including its tab and indentation behavior.
+- Rust: defer formatting to `rustfmt` when the repository adopts it.
+- Python: follow the repository-selected formatter and established Python conventions.
+- C/C++: follow the repository `clang-format` configuration or documented project style when present.
+- C#/.NET: follow `.editorconfig`, compiler and analyzer rules, and the configured formatter.
+- JavaScript, TypeScript, CSS, JSON, and YAML: follow the repository-selected formatter and parser-valid syntax.
+- Makefiles: preserve recipe-tab semantics.
+- Markdown: preserve intentional CommonMark semantics, including hard-break whitespace.
+
+These entries name deferral targets, not installed tools; do not assume a listed tool is available without repository evidence.
+
 ## Cross-references
 
 - Governing agent contract and precedence: `AGENTS.md`
@@ -68,4 +272,4 @@ Passing unit tests are a signal, not a complete change-impact analysis.
 
 ## Lineage and migration
 
-This file separates implementation discipline from the repository-wide ruleset so code-change ownership is explicit without duplicating general policy. It retains the change-impact intent previously distributed across older engineering guidance while making validation a dependency on `testing.rules.md` instead of a second owner. The change-impact procedure and the repository-wide minimal-change and preserve-unrelated-work requirements were absorbed from `general.rules.md` during the GEN migration.
+This file separates implementation discipline from the repository-wide ruleset so code-change ownership is explicit without duplicating general policy. It retains the change-impact intent previously distributed across older engineering guidance while making validation a dependency on `testing.rules.md` instead of a second owner. The change-impact procedure and the repository-wide minimal-change and preserve-unrelated-work requirements were absorbed from `general.rules.md` during the GEN migration. The formatting precedence, whitespace, indentation, file-hygiene, layout, naming, comment, import, control-flow, error-handling, constant, dead-code, change-hygiene, security-baseline, and language-override conventions were added later as portable, language-aware defaults that defer to canonical formatters and ecosystem standards rather than a universal house style.

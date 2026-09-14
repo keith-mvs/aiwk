@@ -4,19 +4,12 @@ generated_at: 2026-09-14
 policy_version: 3
 status: active
 scope: repository
-rules_root: rules/version_3
+rules_root: .
+tracking: tracked
 references:
-  - rules/version_3/AGENTS.md
+  - AGENTS.md
 tags: [metadata, frontmatter, rules]
 ---
-
-| Field | Value |
-| --- | --- |
-| Version | 3 |
-| Status | Active |
-| Scope | Metadata and frontmatter policy for durable repository artifacts |
-| Rule namespace | `MET` |
-| Change field | `policy_version: 3` |
 
 Metadata policy for generated and agent-touched durable artifacts. Require lean, machine-readable metadata on every newly generated durable artifact and on every existing durable file an agent touches when that file lacks required metadata. Do not alter underlying protocols, behavioral semantics, requirement strength, precedence, state transitions, defaults, interfaces, or execution behavior merely to add or normalize metadata.
 

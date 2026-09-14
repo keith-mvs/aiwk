@@ -4,19 +4,12 @@ generated_at: 2026-09-14
 policy_version: 3
 status: active
 scope: repository
-rules_root: rules/version_3
+rules_root: .
+tracking: tracked
 references:
-  - rules/version_3/AGENTS.md
+  - AGENTS.md
 tags: [testing, validation, rules]
 ---
-
-| Field | Value |
-| --- | --- |
-| Version | 3 |
-| Status | Active |
-| Scope | Test selection, execution, interpretation, and validation evidence |
-| Rule namespace | `TST` |
-| Change field | `policy_version: 3` |
 
 ## Applicability
 

@@ -1,12 +1,15 @@
-# Remote Repository Rules
-
-| Field | Value |
-| --- | --- |
-| Version | 3 |
-| Status | Active |
-| Scope | Git remotes, GitHub accounts, network synchronization, and publication |
-| Rule namespace | `REM` |
-| Change field | `policy_version: 3` |
+---
+title: Remote Repository Rules
+generated_at: 2026-09-14
+policy_version: 3
+status: active
+scope: repository
+rules_root: .
+tracking: tracked
+references:
+  - AGENTS.md
+tags: [remotes, git, rules]
+---
 
 ## Remote inventory and current evidence
 

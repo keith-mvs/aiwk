@@ -4,19 +4,12 @@ generated_at: 2026-09-14
 policy_version: 3
 status: active
 scope: repository
-rules_root: rules/version_3
+rules_root: .
+tracking: tracked
 references:
-  - rules/version_3/AGENTS.md
+  - AGENTS.md
 tags: [security, rules]
 ---
-
-| Field | Value |
-| --- | --- |
-| Version | 3 |
-| Status | Active |
-| Scope | Local development, repository content, tooling, credentials, and agent operations |
-| Rule namespace | `SEC` |
-| Change field | `policy_version: 3` |
 
 > Aligned with NIST AI RMF 1.0; not a certification.
 

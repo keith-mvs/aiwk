@@ -4,14 +4,15 @@ generated_at: 2026-09-14
 policy_version: 3
 status: active
 scope: repository
-rules_root: rules/version_3
+rules_root: .
+tracking: tracked
 references:
-  - rules/version_3/
+  - ./
   - .codex/rules/
 tags: [agents, routing, rules]
 ---
 
-Stable entry point for coding agents in this repository. Canonical protocols live in `rules/version_3/*.rules.md`; this file carries discovery, scope, precedence, and routing only. `*.rules.md` files are ordinary Markdown policy modules made applicable by this contract; do not claim a platform executes them natively.
+Stable entry point for coding agents in this repository. Canonical protocols live in the `*.rules.md` modules co-located with this contract; this file carries discovery, scope, precedence, and routing only. `*.rules.md` files are ordinary Markdown policy modules made applicable by this contract; do not claim a platform executes them natively.
 
 ## Scope
 
@@ -38,7 +39,7 @@ Same-level conflicts: prefer narrower scope, then the newer explicit version, th
 
 ## Policy layers
 
-- Semantic policy: `rules/version_3/*.rules.md` (routing index below).
+- Semantic policy: the `*.rules.md` modules co-located with this contract (routing index below).
 - Executable command policy: `.codex/rules/*.rules` classifies command prefixes as `allow`, `prompt`, or `forbidden` only; it does not grant semantic authority.
 - Sandbox and approval boundaries are configured outside repository policy.
 - More restrictive applicable control prevails. Read the owning rule before mutating repository state.
@@ -47,23 +48,23 @@ Same-level conflicts: prefer narrower scope, then the newer explicit version, th
 
 | tag | ns | rule |
 | --- | --- | --- |
-| coding | COD | `rules/version_3/coding.rules.md` |
-| commits | COM | `rules/version_3/commits.rules.md` |
-| configuration | CFG | `rules/version_3/configuration.rules.md` |
-| context | CTX | `rules/version_3/context.rules.md` |
-| environments | ENV | `rules/version_3/environments.rules.md` |
-| metadata | MET | `rules/version_3/metadata.rules.md` |
-| naming | NAM | `rules/version_3/naming.rules.md` |
-| remotes | REM | `rules/version_3/remotes.rules.md` |
-| security | SEC | `rules/version_3/security.rules.md` |
-| skills | SKL | `rules/version_3/skills.rules.md` |
-| testing | TST | `rules/version_3/testing.rules.md` |
+| coding | COD | `coding.rules.md` |
+| commits | COM | `commits.rules.md` |
+| configuration | CFG | `configuration.rules.md` |
+| context | CTX | `context.rules.md` |
+| environments | ENV | `environments.rules.md` |
+| metadata | MET | `metadata.rules.md` |
+| naming | NAM | `naming.rules.md` |
+| remotes | REM | `remotes.rules.md` |
+| security | SEC | `security.rules.md` |
+| skills | SKL | `skills.rules.md` |
+| testing | TST | `testing.rules.md` |
 
 Read order: this contract, then the specialized rules applicable to the task; `coding` for implementation edits, `testing` for validation and evidence.
 
 ## Local
 
-Read `rules/version_3/AGENTS.local.md` when present: machine-local facts and authorized specialization. It is not a universally native discovery filename; this contract requires the read.
+Read the sibling `AGENTS.local.md` when present: machine-local facts and authorized specialization. It is not a universally native discovery filename; this contract requires the read.
 
 ## Fail closed
 
