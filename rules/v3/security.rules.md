@@ -37,6 +37,10 @@ Protect:
 
 ## Secret classification and handling
 
+## Executable command guardrails
+
+`.codex/rules/dangerous.rules` is a technical command-prefix guardrail. It can block or prompt selected shell commands, but it does not replace sandbox boundaries, approval policy, secret handling, or the security analysis in this file. Opaque wrappers and indirect dispatch fail closed only when the effective command is known.
+
 Treat the following as sensitive unless the owner explicitly classifies them otherwise:
 
 - passwords, API keys, access tokens, refresh tokens, session cookies, bearer headers;

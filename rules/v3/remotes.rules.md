@@ -45,6 +45,10 @@ gh auth status --active
 - If a remote URL contains embedded credentials, treat it as a security finding and do not repeat the value.
 - Discovery does not authorize mutation or network publication.
 
+## Executable command guardrails
+
+Repository-local `.codex/rules/*.rules` may mirror narrow command-prefix classification for safe inspection and approval-gated remote mutations. Those executable rules do not establish host, account, owner, or push authorization, and they do not replace the requirements in this file. A command allowed by `.rules` is still subject to the remote identity and publication checks below.
+
 ## Remote naming conventions
 
 | Name | Intended meaning |

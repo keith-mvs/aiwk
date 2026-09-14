@@ -13,6 +13,16 @@ This file is the stable entry point for coding agents operating in this reposito
 
 Only this `AGENTS.md` file is presumed to be a portable repository-agent entry point. The referenced `*.rules.md` files are ordinary Markdown policy modules; they become applicable because this contract directs agents to read them. Do not claim that an agent platform executes arbitrary `*.rules.md` files natively unless the platform documentation and repository configuration establish that behavior.
 
+## Policy layers
+
+- Semantic policy: `rules/version-3/*.rules.md` is the source of truth for required behavior, evidence, authority, and completion.
+- Executable command policy: `.codex/rules/*.rules` classifies command prefixes only with `allow`, `prompt`, or `forbidden`.
+- Sandbox and approvals: technical access, network and filesystem boundaries, and elevation policy are configured separately.
+- A command allowed by `.codex/rules` is still subject to the semantic Markdown owner.
+- A command prompted by `.codex/rules` is not authorized until the semantic policy and current task authorize it.
+- More restrictive applicable controls prevail.
+- Read the owning Markdown policy before mutating repository state.
+
 ## Scope
 
 - This file applies from its directory downward.
@@ -43,7 +53,7 @@ For same-level conflicts, prefer narrower scope, then the newer explicit version
 1. Resolve the working root with `git rev-parse --show-toplevel`; when Git is unavailable, use the nearest directory that contains the project configuration and state the fallback.
 2. Discover the applicable instruction chain from the root to the working directory, including nested `AGENTS.md` files and supported provider-specific instruction files.
 3. Read `AGENTS.local.md` when present. It is a repository convention, not a universally native filename; this contract is the authority requiring its read.
-4. Read `general.rules.md` and only the specialized rule files relevant to the task.
+4. Read `general.rules.md`, then the specialized rule files relevant to the task. Use `coding.rules.md` for implementation and code-adjacent edits, `testing.rules.md` for test selection, execution, interpretation, and evidence, and consult `.codex/rules/*.rules` separately for executable command classification only.
 5. Inspect repository status, structure, configuration, dependency declarations, generated-file policy, and relevant tests before editing.
 6. Identify pre-existing changes and establish the task-owned write set. Preserve unrelated user work.
 7. State or record the objective, constraints, assumptions, acceptance criteria, validation plan, and rollback boundary before mutation.
@@ -55,7 +65,10 @@ For same-level conflicts, prefer narrower scope, then the newer explicit version
 
 | Concern | Detailed policy |
 | --- | --- |
-| General execution, precedence, temp files, completion | `general.rules.md` |
+| General execution, precedence, temp files, completion | general.rules.md |
+| Executable command classification | .codex/rules/*.rules |
+| Implementation and code changes | `coding.rules.md` |
+| Tests, build, lint, typecheck, validation | `testing.rules.md` |
 | Commits, staging, signing, history | `commits.rules.md` |
 | File placement, configuration ownership, portability | `configuration.rules.md` |
 | Context, caching, invalidation, agentic processing | `context.rules.md` |
@@ -80,6 +93,7 @@ For same-level conflicts, prefer narrower scope, then the newer explicit version
 
 - Select validation from repository evidence: tests, linters, type checks, builds, schema checks, migrations, packaging, security checks, and targeted manual inspection as applicable.
 - For a bug, add or tighten a deterministic regression test when feasible and verify that it protects the corrected behavior.
+- Regression-test integrity decisions, including protection of preexisting tests and exceptions for new tests or authorized behavior changes, are governed by `testing.rules.md`.
 - Test observable behavior and stable contracts rather than incidental implementation details.
 - Run narrow checks first, then broader affected suites. Do not weaken or delete pre-existing tests merely to obtain a pass without explicit authorization.
 - A reported `PASS` requires an executed check and observed successful result. An unrun check is `NOT PERFORMED`; an unresolved result is `<TBD>`.

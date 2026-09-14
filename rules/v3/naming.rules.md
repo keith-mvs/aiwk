@@ -120,7 +120,7 @@ Also preserve ecosystem-mandated names such as `pyproject.toml`, `package.json`,
 
 ## Tests and fixtures
 
-- Follow the test framework's discovery convention; do not impose a universal `*.test` suffix.
+- Follow the test framework's discovery convention; do not impose a universal `*.test` suffix. Test selection, execution, interpretation, and evidence live in `testing.rules.md`.
 - Test names SHOULD describe behavior and condition, not implementation sequence.
 - Regression tests SHOULD identify the failed behavior without embedding sensitive incident data.
 - Fixture names SHOULD identify scenario, variant, and expected class when needed.
@@ -211,4 +211,4 @@ agent_rules-v3-latest-copy.zip
 
 ## Lineage and migration
 
-This file retains the naming rules from `v1/naming.md` and `v2/repo.md`, including lowercase kebab case, language idioms, sentinel exceptions, and generated-file ownership. The universal `*.test` rule was replaced with framework-native test discovery. The testing policy accidentally embedded in `v1/naming.md` was moved to `AGENTS.md` and `general.rules.md` rather than duplicated here.
+This file retains the naming rules from `v1/naming.md` and `v2/repo.md`, including lowercase kebab case, language idioms, sentinel exceptions, and generated-file ownership. The universal `*.test` rule was replaced with framework-native test discovery. Test execution, interpretation, and evidence live in `testing.rules.md`, with `AGENTS.md` routing to it.

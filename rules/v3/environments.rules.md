@@ -89,6 +89,10 @@ Do not select a globally installed interpreter, package manager, or dependency v
 
 ## Python policy
 
+## Executable command guardrails
+
+Repository-local `.codex/rules/*.rules` may allow version and discovery commands and prompt on environment or package mutations such as virtualenv creation or dependency installation. Those executable rules do not decide which interpreter, package manager, or environment is correct; that remains governed by the evidence and selection precedence in this file. An executable allow still has to target the correct environment.
+
 ### Project isolation
 
 - Every Python project MUST use a project-specific environment or an explicitly isolated tool environment.

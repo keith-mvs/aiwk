@@ -42,6 +42,10 @@ Record unresolved values in `AGENTS.local.md`; do not invent identity, signing, 
 
 ## Commit message format
 
+## Executable command guardrails
+
+Repository-local `.codex/rules/*.rules` may allow read-only Git inspection and prompt for staging, commit, history-rewrite, branch, tag, and cleanup commands. They may forbid destructive forms such as `git reset --hard`, but they do not waive commit-message format, signing, provenance, staging discipline, or rollback requirements in this file.
+
 Use:
 
 ```text
@@ -163,7 +167,7 @@ Before committing:
 1. Confirm authority to commit.
 2. Confirm branch and repository state.
 3. Review unstaged and staged diffs.
-4. Run relevant tests, lint, type, schema, build, and generation checks against the final staged content where feasible.
+4. Run relevant validation defined in `testing.rules.md` against the final staged content where feasible.
 5. Scan staged content for credentials, private keys, tokens, sensitive personal data, local absolute paths, and transient artifacts.
 6. Verify generated-file provenance.
 7. Verify the commit message against this file and repository convention.

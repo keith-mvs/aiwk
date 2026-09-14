@@ -21,7 +21,7 @@ Use this file for obligations that do not belong to a more specific rule file. W
 | ID | Requirement | Observable verification |
 | --- | --- | --- |
 | GEN-001 | The agent MUST discover the repository root, applicable instructions, repository status, and task-owned write set before mutation. | Root, instruction chain, status, and intended paths are identified in task state or final evidence. |
-| GEN-002 | The agent MUST inspect relevant implementation, configuration, callers, callees, contracts, tests, generated-file ownership, and live entry points before editing. | The change rationale identifies affected flows and evidence paths. |
+| GEN-002 | The agent MUST inspect relevant implementation, configuration, contracts, and live entry points before editing. | The change rationale identifies affected flows and evidence paths. |
 | GEN-003 | The agent MUST minimize the change surface and MUST preserve unrelated user changes. | Final diff contains only task-owned changes or explicitly justified collateral changes. |
 | GEN-004 | The agent MUST distinguish observed facts, externally verified evidence, inference, assumptions, unknowns, and unperformed checks. | Claims use evidence-bounded wording; unresolved material items are `<TBD>` or `NOT PERFORMED`. |
 | GEN-005 | The agent MUST NOT claim completion, deployment, publication, validation, approval, or security status that was not directly established. | Final report includes commands/results and does not promote intent to evidence. |
@@ -111,6 +111,8 @@ When the destination, owner, authority, or required action is ambiguous:
 5. do not mutate remote state, credentials, history, or security controls as a fallback.
 
 ## Cross-references
+- Implementation and code-change discipline: `coding.rules.md`
+- Test selection, execution, interpretation, and evidence: `testing.rules.md`
 
 - File placement and ignored artifacts: `configuration.rules.md`
 - Naming: `naming.rules.md`
@@ -121,4 +123,4 @@ When the destination, owner, authority, or required action is ambiguous:
 
 ## Lineage and migration
 
-This file consolidates `v1/change-impact.md`, `v1/coding.md`, `v1/engineering.md`, the testing and cleanup portions of `v1/naming.md`, and `v2/repo.md`. Exact duplicates were removed. The unqualified instruction to use the latest stable dependency was replaced with repository- and compatibility-driven dependency selection. The hard-coded `/memories` path and unsupported executable-rule assumptions were not retained.
+This file consolidates `v1/change-impact.md`, `v1/coding.md`, `v1/engineering.md`, the general cleanup portions of `v1/naming.md`, and `v2/repo.md`. Implementation-level code-change discipline now lives in `coding.rules.md`, and validation execution and evidence live in `testing.rules.md`. Exact duplicates were removed. The unqualified instruction to use the latest stable dependency was replaced with repository- and compatibility-driven dependency selection. The hard-coded `/memories` path and unsupported executable-rule assumptions were not retained.
