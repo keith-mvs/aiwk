@@ -56,5 +56,5 @@ prompts:
   - {id: repo.clean-repository, path: maintenance/clean-repository.prompt, category: maintenance, stage: analyze, authority_level: bounded-mutation}
   - {id: repo.investigate-performance, path: performance/investigate-performance.prompt, category: performance, stage: analyze, authority_level: bounded-mutation}
   - {id: repo.execute-work-item, path: workflow/execute-work-item.prompt, category: workflow, stage: discover, authority_level: bounded-mutation}
+  - {id: repo.monitor-session, path: workflow/monitor-session.prompt, category: workflow, stage: inspect, authority_level: read-only}
   - {id: research.source-grounded-analysis, path: research/source-grounded-analysis.prompt, category: research, stage: discover, authority_level: read-only}
-

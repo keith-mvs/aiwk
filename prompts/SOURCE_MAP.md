@@ -1,3 +1,14 @@
+---
+title: Source Map and Completeness Record
+generated_at: 2026-09-14
+status: active
+scope: repository
+tracking: tracked
+references:
+  - manifest.yaml
+tags: [prompts, provenance, source-map]
+---
+
 # Source Map and Completeness Record
 
 ## Scope

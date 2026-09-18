@@ -1,6 +1,6 @@
 # Repo-local executable mutation policy.
 # These rules gate state-changing commands that remain subject to the semantic
-# requirements in rules/version-3/*.rules.md.
+# requirements in rules/version_3/*.rules.md.
 
 # ---------------------------------------------------------------------------
 # Git working-tree, index, and history mutations

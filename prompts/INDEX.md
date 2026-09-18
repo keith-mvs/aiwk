@@ -1,3 +1,15 @@
+---
+title: Reusable Prompt Corpus Index
+generated_at: 2026-09-14
+status: active
+scope: repository
+tracking: tracked
+references:
+  - manifest.yaml
+  - SOURCE_MAP.md
+tags: [prompts, index]
+---
+
 # Reusable Prompt Corpus
 
 This corpus contains repository-agnostic prompts distilled from the complete source library described in [SOURCE_MAP.md](SOURCE_MAP.md). Select one prompt by task outcome, provide its declared inputs, and preserve its authority boundary. Prompt metadata is indexed in [manifest.yaml](manifest.yaml).
@@ -61,6 +73,7 @@ A prompt lists every stage it spans. Its first listed stage is the dominant rout
 | Maintenance | [Clean Repository](maintenance/clean-repository.prompt) | Remove confirmed clutter without deleting owned or generated artifacts. |
 | Performance | [Investigate Performance](performance/investigate-performance.prompt) | Measure a bottleneck, identify cause, and validate a bounded improvement. |
 | Workflow | [Execute Work Item](workflow/execute-work-item.prompt) | Carry an authorized work item from discovery through verified completion. |
+| Workflow | [Monitor Agent Session](workflow/monitor-session.prompt) | Observe an active agent session and report evidence-bounded feedback. |
 | Research | [Source-Grounded Analysis](research/source-grounded-analysis.prompt) | Answer a bounded question with authoritative, traceable evidence. |
 
 ## Common Chains
@@ -71,4 +84,3 @@ A prompt lists every stage it spans. Its first listed stage is the dominant rout
 - Delivery: `repo.validate-change` -> `repo.create-commit` -> `repo.publish-remote-changes`
 - Release: `repo.assess-release-readiness` -> `repo.publish-release`
 - Corpus maintenance: `prompt.maintain-corpus` -> `repo.validate-change` -> `repo.create-commit`
-

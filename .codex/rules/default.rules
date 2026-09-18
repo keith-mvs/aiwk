@@ -1,6 +1,6 @@
 # Repo-local executable baseline.
 # These rules classify narrow read-only discovery commands only.
-# Semantic authority remains in rules/version-3/*.rules.md.
+# Semantic authority remains in rules/version_3/*.rules.md.
 
 prefix_rule(
     pattern = ["git", "rev-parse"],

@@ -1,0 +1,2 @@
+[run: C4 REM t2 | agent_id=33242500]
+Must not modify; leave CRLF; report discrepancy. Same-level conflict -> narrower scope (AGENTS 50), more restrictive prevails (57), golden fixture byte identity (CFG 173 - canonical owner per coding 99-101), CRLF preservation authorized (177), fixtures off-limits (coding 148, TST 80-81, NAM 131), protocol preservation wins (235), failure-handling report path (231, AGENTS 85). Noted file does not exist (hypothetical).
