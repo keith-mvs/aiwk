@@ -1,2 +1,0 @@
-[run: C4 REM t1 | agent_id=9c7f89f7]
-Do not modify; leave byte-identical; record and report conflict as preserved exception. Cited: AGENTS precedence (narrower scope, more specific condition), configuration (byte-identity for fixtures, protocol preservation wins), testing (protected regression expectations), naming (golden update procedure), coding (no fixture edits for formatting), fail-closed reporting, exception-register path. Also observed data/export.csv does not exist (hypothetical task).

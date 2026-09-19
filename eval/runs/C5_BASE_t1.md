@@ -1,2 +1,0 @@
-[run: C5 BASE t1 | agent_id=9edb1cc5]
-No general module exists. Found live rules/version_3/AGENTS.md index (11 modules) and security.rules.md:288 lineage ("absorbed from general.rules.md during GEN migration"). Reported module absent/TBD, attributed requirements to successor owner security.rules.md (lines 123-131 member validation, staging, trust, 179 target resolution, 240 verification, 260-268 safe fallback) + configuration/context/naming corroboration. Noted .codex has no archive prefixes. Also found eval corpus oracle.

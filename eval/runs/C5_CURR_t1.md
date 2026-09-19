@@ -1,2 +1,0 @@
-[run: C5 CURR t1 | agent_id=428a551c]
-No general.rules.md in eval/policy_current; absorbed into security.rules.md during GEN migration (line 286) + configuration temp-artifact rules (249). Full requirements quoted: member validation (125), staging (126, 123), trust (124,127,128,129), untrusted embedded docs (context 256-266, SEC-003), target resolution (177), verification (238), safe fallback (258-266), naming release validation (174).
