@@ -1,14 +1,15 @@
 ---
 title: Naming Rules
-generated_at: 2026-09-14
+generated_at: "2026-09-19T00:34:01Z"
+references:
+  - AGENTS.md
+  - configuration.rules.md
+  - testing.rules.md
 policy_version: 3
 status: active
 scope: repository
 rules_root: .
 tracking: tracked
-references:
-  - AGENTS.md
-  - testing.rules.md
 tags: [naming, files, rules]
 ---
 
@@ -23,7 +24,7 @@ Use this abstract component model when the ecosystem does not mandate a filename
 Render optional components with the repository's controlled separators; the default rendered grammar is:
 
 ```text
-[prefix-]base[-modifier...][-suffix][.extension]
+[prefix-]base[-modifier...][.suffix][.extension]
 ```
 
 | Component | Required | Definition |
@@ -57,7 +58,7 @@ service-config-template.yaml
 repository-rules-v3.zip
 ```
 
-Avoid redundant markers such as `final`, `new`, `latest`, `copy`, repeated versions, or status words whose meaning is not controlled.
+A filename MUST NOT include redundant markers such as `final`, `new`, `latest`, or `copy`, repeated versions, or status words whose meaning is not controlled.
 
 ## General casing and separators
 
@@ -108,10 +109,8 @@ Also preserve ecosystem-mandated names such as `pyproject.toml`, `package.json`,
 
 ## Markdown and rule files
 
-- Use `lowercase-kebab-case` for generic Markdown files.
 - Preserve the mandatory v3 filenames exactly.
 - Use ATX headings and stable heading text to avoid anchor churn.
-- Do not encode a transient status or generation timestamp in a stable policy filename.
 - Nested repository agent guidance remains `AGENTS.md`; do not invent variants unless the target platform documents them.
 
 ## Source code
@@ -124,7 +123,7 @@ Also preserve ecosystem-mandated names such as `pyproject.toml`, `package.json`,
 
 ## Tests and fixtures
 
-- Follow the test framework's discovery convention; do not impose a universal `*.test` suffix. Test selection, execution, interpretation, and evidence live in `testing.rules.md`.
+- Follow the test framework's discovery convention; do not impose a universal `*.test` suffix.
 - Test names SHOULD describe behavior and condition, not implementation sequence.
 - Regression tests SHOULD identify the failed behavior without embedding sensitive incident data.
 - Fixture names SHOULD identify scenario, variant, and expected class when needed.
@@ -142,7 +141,7 @@ fixtures/invalid-binding.json
 
 ## Configuration, schemas, and migrations
 
-- Prefer the ecosystem's canonical config filename.
+- Prefer the ecosystem's canonical configuration filename (see Required sentinel exceptions).
 - Use `*.schema.json`, `*.schema.yaml`, or the repository's established schema convention.
 - Migration names MUST use the framework's ordering identifier and a stable semantic description.
 - Do not renumber or reuse a published migration or stable schema identifier.
@@ -153,25 +152,24 @@ fixtures/invalid-binding.json
 - Mark generated ownership in a header, manifest, or repository-standard metadata when the format permits.
 - Use a `generated` suffix only when needed to distinguish the file from its source; prefer a dedicated generated directory or manifest when that is the repository convention.
 - Never add a misleading generated marker to hand-authored content.
-- Do not hand-edit a generated artifact.
+- Generated-content ownership and the hand-edit prohibition: `configuration.rules.md`.
 
 ## Reports, logs, temporary files, and backups
 
 | Class | Naming pattern | Tracking |
 | --- | --- | --- |
-| Durable report | `<topic>[-<date>]-report.<ext>` when date is part of identity | Conditional |
+| Durable report | `<topic>[-<YYYY-MM-DD>]-report.<ext>` when date is part of identity | Conditional |
 | Local log | `<component>-<YYYY-MM-DD>.log` or tool convention | Ignored |
 | Temporary file | `<base>-tmp.<ext>` or tool-generated unique name inside a temp directory | Ignored and removed |
-| Diagnostic dump | `<component>-<failure-class>-<date>.<ext>` in restricted local storage | Ignored |
+| Diagnostic dump | `<component>-<failure-class>-<YYYY-MM-DD>.<ext>` in restricted local storage | Ignored |
 | Backup | `<base>-backup-<YYYY-MM-DD>.<ext>` only when a real retention workflow requires it | Normally outside repository |
-| Archive | `<base>[-vN].zip` or repository release convention | Conditional |
+| Archive | See `Archive files` | Conditional |
 
 Do not create manual backup copies inside source control. Git history is not replaced by `file-old`, `file-copy`, or `file-backup` clutter.
 
 ## Archive files
 
-- Use the repository release convention; otherwise use `<base>[-vN].zip`, `<base>[-vN].tar.gz`, or the ecosystem-standard extension.
-- Keep the version marker before the archive extension and do not append uncontrolled status markers.
+- Follow the repository release convention; otherwise use `<base>[-vN].zip`, `<base>[-vN].tar.gz`, or the ecosystem-standard extension, keeping the version marker before the archive extension.
 - Validate member paths and exclude caches, secrets, local state, and unrelated artifacts before release.
 - Treat an archive as a derivative unless repository policy explicitly makes it authoritative.
 
@@ -181,7 +179,6 @@ Do not create manual backup copies inside source control. Git history is not rep
 - Use side-by-side filename versions only when consumers require simultaneous versions or the task explicitly preserves lineage.
 - For major lineage sets, use `name-v1.ext`, `name-v2.ext`, `name-v3.ext`.
 - Use lowercase `v` followed by an integer for document-generation lineage unless the repository uses another controlled format.
-- Do not combine version labels with uncontrolled status labels.
 
 Valid:
 
@@ -206,7 +203,7 @@ agent_rules-v3-latest-copy.zip
 
 ## Renaming procedure
 
-1. Identify all references, imports, links, manifests, build rules, external consumers, and case-sensitive filesystem effects.
+1. Inventory every dependency covered by NAM-003, including external consumers, plus case-sensitive filesystem effects.
 2. Define the new canonical name and compatibility/redirect strategy.
 3. Perform a case-safe rename when the filesystem is case-insensitive.
 4. Update references atomically with the rename.
@@ -219,4 +216,4 @@ agent_rules-v3-latest-copy.zip
 
 ## Lineage and migration
 
-This file retains the naming rules from `v1/naming.md` and `v2/repo.md`, including lowercase kebab case, language idioms, sentinel exceptions, and generated-file ownership. The universal `*.test` rule was replaced with framework-native test discovery. Test execution, interpretation, and evidence live in `testing.rules.md`, with `AGENTS.md` routing to it.
+This file retains the naming rules from `v1/naming.md` and `v2/repo.md`, including lowercase kebab case, language idioms, sentinel exceptions, and generated-file ownership. The universal `*.test` rule was replaced with framework-native test discovery; test execution, interpretation, and evidence moved to `testing.rules.md`.

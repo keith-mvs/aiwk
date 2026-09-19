@@ -1,11 +1,6 @@
 ---
 title: Test and Validation Rules
-generated_at: 2026-09-14
-policy_version: 3
-status: active
-scope: repository
-rules_root: .
-tracking: tracked
+generated_at: "2026-09-19T00:34:01Z"
 references:
   - AGENTS.md
   - coding.rules.md
@@ -14,6 +9,11 @@ references:
   - security.rules.md
   - commits.rules.md
   - remotes.rules.md
+policy_version: 3
+status: active
+scope: repository
+rules_root: .
+tracking: tracked
 tags: [testing, validation, rules]
 ---
 
@@ -121,9 +121,7 @@ Future `.codex/rules/*.rules` may classify specific test, build, check, and vali
 
 ## Additional guidance
 
-- Test filenames remain under `naming.rules.md`; this file owns execution, interpretation, and evidence.
 - When a validation command is also a code-change command, the code-change discipline in `coding.rules.md` still applies.
-- Security-sensitive validation defers to `security.rules.md`; external-target and publication boundaries defer to `remotes.rules.md`.
 
 ## Validation and completion
 

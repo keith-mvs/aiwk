@@ -1,16 +1,16 @@
 ---
 title: Commit Rules
-generated_at: 2026-09-14
-policy_version: 3
-status: active
-scope: repository
-rules_root: .
-tracking: tracked
+generated_at: "2026-09-19T00:34:01Z"
 references:
   - AGENTS.md
   - testing.rules.md
   - remotes.rules.md
   - security.rules.md
+policy_version: 3
+status: active
+scope: repository
+rules_root: .
+tracking: tracked
 tags: [commits, git, rules]
 ---
 
@@ -43,7 +43,7 @@ Record unresolved values in `AGENTS.local.md`; do not invent identity, signing, 
 | COM-001 | The agent MUST create a commit only when the current task or applicable repository policy authorizes it. |
 | COM-002 | The agent MUST NOT amend, rebase, reset, squash, cherry-pick, or otherwise rewrite existing history without authority that covers the exact operation and affected commits. |
 | COM-003 | The agent MUST NOT push, force-push, publish a release, create a remote repository, or open a pull request solely because a local commit was authorized. |
-| COM-004 | The agent MUST preserve unrelated staged and unstaged user changes and MUST NOT use broad staging commands when they could include unrelated files. |
+| COM-004 | The agent MUST preserve unrelated staged and unstaged user changes. |
 | COM-005 | The agent MUST NOT create or use a fabricated Git identity, signing key, co-author, issue reference, or attribution. |
 
 ## Executable command guardrails
@@ -87,7 +87,7 @@ Rules:
 | COM-006 | One commit MUST represent one reviewable logical change. | The commit can be reverted without separating unrelated concerns. |
 | COM-007 | Production code, its required tests, contract/schema updates, generated derivatives, and documentation MUST remain in the same commit when they jointly define one behavior change. | No intermediate committed state violates the intended contract. |
 | COM-008 | Formatting-only, dependency-only, configuration-only, and generated-output-only changes SHOULD be separate when separation improves review and does not break repository invariants. | Each separated commit remains buildable or the dependency is explicitly ordered. |
-| COM-009 | Stage explicit paths or hunks. Avoid `git add -A`, `git add .`, and broad glob staging when unrelated work exists. | `git diff --staged --name-status` contains only task-owned paths. |
+| COM-009 | Stage explicit paths or hunks. The agent MUST NOT use `git add -A`, `git add .`, or broad glob staging when they could include unrelated files. | `git diff --staged --name-status` contains only task-owned paths. |
 | COM-010 | Do not stage caches, logs, local overrides, secrets, temp files, crash dumps, or editor state. | Staged-path and secret review passes. |
 
 Recommended review sequence:

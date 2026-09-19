@@ -1,15 +1,15 @@
 ---
 title: Development Environment Rules
-generated_at: 2026-09-14
+generated_at: "2026-09-19T00:34:01Z"
+references:
+  - AGENTS.md
+  - AGENTS.local.md
+  - security.rules.md
 policy_version: 3
 status: active
 scope: repository
 rules_root: .
 tracking: tracked
-references:
-  - AGENTS.md
-  - AGENTS.local.md
-  - security.rules.md
 tags: [environments, runtimes, rules]
 ---
 
@@ -199,10 +199,6 @@ A tool's documented secure location overrides the generic fallback.
 `security.rules.md` owns secret classification, disclosure boundaries, and lifecycle requirements; this section adds only the environment-mechanics obligations.
 
 - Store sensitive credentials in Proton Pass rather than any location `security.rules.md` forbids (Markdown, source, shell profiles, task prompts, tickets, repository history).
-- Resolve a credential only when a specific authorized operation requires it.
-- Prefer child-process or process-scoped injection over environment files.
-- Clear manually exported secret variables immediately after use.
-- Preserve a stable secret reference or logical name rather than the secret value.
 
 ## Proton Pass CLI policy
 
@@ -216,7 +212,7 @@ Use URI references in this form:
 pass://<vault>/<item>/<field>
 ```
 
-Prefer stable IDs over ambiguous names when duplicate names exist, but do not place sensitive vault/item identifiers in portable policy.
+Prefer stable IDs over ambiguous names when duplicate names exist.
 
 ### Process-scoped execution
 
@@ -237,7 +233,7 @@ SERVICE_TOKEN=pass://<vault>/<item>/<field>
 pass-cli run --env-file .env.local -- command --arguments
 ```
 
-`pass-cli run` resolves references for the child process and masks matching secret values in stdout/stderr by default. Do not use `--no-masking` unless the current task explicitly requires it and output controls are established.
+`pass-cli run` resolves references for the child process and masks matching secret values in stdout/stderr by default.
 
 ### File injection
 

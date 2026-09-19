@@ -1,16 +1,16 @@
 ---
 title: Remote Repository Rules
-generated_at: 2026-09-14
+generated_at: "2026-09-19T00:34:01Z"
+references:
+  - AGENTS.md
+  - AGENTS.local.md
+  - environments.rules.md
+  - security.rules.md
 policy_version: 3
 status: active
 scope: repository
 rules_root: .
 tracking: tracked
-references:
-  - AGENTS.md
-  - environments.rules.md
-  - security.rules.md
-  - AGENTS.local.md
 tags: [remotes, git, rules]
 ---
 
@@ -144,8 +144,6 @@ Before push:
 7. push only the intended refs;
 8. inspect and report the observed result.
 
-Do not treat a local commit request as push authorization.
-
 ## Force push and rewritten history
 
 - Force push is prohibited unless the user explicitly authorizes the exact remote and branch after the rewrite is understood.
@@ -173,7 +171,6 @@ For add, rename, URL change, or removal:
 - Set `--repo`, `--hostname`, owner, visibility, base, and head explicitly for high-impact operations.
 - Do not rely on ambient account selection when multiple accounts or hosts exist.
 - `gh repo create`, `gh pr create`, `gh release create`, repository settings changes, secret changes, and workflow dispatches are externally visible actions and require explicit authorization.
-- Do not pass secrets as CLI arguments when a supported environment or credential mechanism exists.
 
 ## Verification after remote actions
 

@@ -1,13 +1,13 @@
 ---
 title: Skill Discovery and Invocation Rules
-generated_at: 2026-09-14
+generated_at: "2026-09-14T00:00:00Z"
+references:
+  - AGENTS.md
 policy_version: 3
 status: active
 scope: repository
 rules_root: .
 tracking: tracked
-references:
-  - AGENTS.md
 tags: [skills, agents, rules]
 ---
 

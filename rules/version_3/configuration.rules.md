@@ -1,11 +1,6 @@
 ---
 title: Configuration and File-Placement Rules
-generated_at: 2026-09-14
-policy_version: 3
-status: active
-scope: repository
-rules_root: .
-tracking: tracked
+generated_at: "2026-09-19T00:34:01Z"
 references:
   - AGENTS.md
   - AGENTS.local.md
@@ -13,6 +8,11 @@ references:
   - naming.rules.md
   - security.rules.md
   - metadata.rules.md
+policy_version: 3
+status: active
+scope: repository
+rules_root: .
+tracking: tracked
 tags: [configuration, placement, rules]
 ---
 
@@ -121,8 +121,7 @@ Do not encode a user's home path or workstation identifier in portable configura
 
 For user-scoped tool state outside a repository:
 
-- On XDG-aware systems, prefer `${XDG_CONFIG_HOME:-${HOME}/.config}`, `${XDG_CACHE_HOME:-${HOME}/.cache}`, and `${XDG_STATE_HOME:-${HOME}/.local/state}`.
-- On Windows, use application-supported locations under `%APPDATA%`, `%LOCALAPPDATA%`, and `%TEMP%` rather than hard-coded user paths.
+- Use the platform-native config, cache, state, and temp locations defined in `environments.rules.md`; prefer them over hard-coded user paths.
 - Follow the tool's documented location when it conflicts with the generic convention.
 - Do not relocate credentials or security-sensitive state without explicit tool support.
 
@@ -173,6 +172,7 @@ For other tools and runtimes, explicitly request UTF-8 whenever the API or tool 
 `LF` (`0A`) and `CRLF` (`0D 0A`) are distinct byte representations and MUST NOT be treated as equivalent when byte identity, hashing, signatures, patches, generated fixtures, protocol payloads, or exact-format validation is material.
 
 - For repository-controlled text, use the repository's canonical newline convention; when no governing convention exists, default to `LF`.
+- End a repository-controlled text file with exactly one final newline unless a governing format or protocol requires otherwise.
 - Do not introduce mixed newline styles within a file.
 - Preserve `CRLF` only when required by an existing authoritative repository convention, a platform or external protocol contract, generated-file ownership, or a verified consumer requirement.
 - Do not perform whole-file LF/CRLF normalization as an incidental side effect of an unrelated edit unless the active task authorizes that normalization.

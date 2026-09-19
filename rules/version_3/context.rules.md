@@ -1,15 +1,17 @@
 ---
 title: Context and Prompt-Caching Rules
-generated_at: 2026-09-14
+generated_at: "2026-09-19T00:11:52Z"
+references:
+  - AGENTS.md
+  - AGENTS.local.md
+  - security.rules.md
+  - coding.rules.md
+  - testing.rules.md
 policy_version: 3
 status: active
 scope: repository
 rules_root: .
 tracking: tracked
-references:
-  - AGENTS.md
-  - AGENTS.local.md
-  - security.rules.md
 tags: [context, caching, rules]
 ---
 
@@ -44,6 +46,84 @@ Stable policy MUST precede volatile task material in provider-visible context wh
 10. Validate and produce an evidence-bounded handoff.
 
 Do not repeatedly scan the whole repository when a prior discovery remains valid. Do not reuse a discovery whose premises changed.
+
+## Context sufficiency for file processing and changes
+
+This section is the single authoritative Version 3 definition of the requirement to obtain sufficient repository context before processing a file or making changes. Other `*.rules.md` modules MAY reference it and MAY define narrower specializations — for example `coding.rules.md` COD-002 for implementation paths — but they MUST NOT restate it normatively. A specialization, exception, or cross-reference is not duplication merely because it discusses file reading. Repository-level discovery order remains governed by "Deterministic discovery sequence" above; this section governs the per-file context required at the point of analysis or mutation. Targeted complete reads under this section are not whole-tree dumps: "Progressive disclosure" bounds the breadth of exploration, not the completeness of a required target read.
+
+### Full-context read requirement
+
+| ID | Requirement |
+| --- | --- |
+| CTX-001 | Before materially analyzing, transforming, editing, refactoring, deleting, replacing, or otherwise changing a repository file, the agent SHOULD read the target file completely from beginning to end when the file is accessible and its size and tooling permit a complete read. |
+| CTX-002 | Before making a change, the agent MUST identify and read associated files reasonably necessary to understand the target file's purpose, governing rules, dependencies, interfaces, schemas, imports or references, callers and consumers, tests, configuration, generated-source relationships, version-specific conventions, and repository-level constraints. |
+| CTX-003 | The agent MUST obtain enough context to understand the likely effects of a proposed change before mutating repository content. |
+
+### Context-discovery order for file changes
+
+Unless a more specific repository rule governs the task, use this order (CTX-004):
+
+1. read the target file completely;
+2. identify directly referenced or governing files;
+3. read required parent, sibling, dependency, schema, configuration, and test files;
+4. inspect callers or consumers when the proposed change can affect them;
+5. determine whether generated artifacts, mirrored files, or versioned equivalents exist;
+6. only then perform substantive processing or mutation.
+
+### Associated-file selection
+
+Associated files MUST be selected by dependency or semantic relevance, not merely by similar filenames (CTX-005). Prioritize files that:
+
+- govern the target file;
+- define types, schemas, contracts, or protocols used by it;
+- import or consume its output;
+- are imported or referenced by it;
+- validate its behavior;
+- define repository-wide conventions applicable to it;
+- establish version-specific behavior;
+- would likely require coordinated changes if the target changes.
+
+Do not recursively read unrelated repository content without a concrete context need.
+
+### Exceptions and partial reads
+
+A complete read MAY be skipped or bounded when (CTX-006):
+
+- the file is inaccessible;
+- the file is too large for a complete read within available tool or context limits;
+- the file is binary or generated and another authoritative source governs it;
+- the requested operation is provably local and does not depend on surrounding semantics;
+- the user explicitly limits the inspection scope;
+- the governing tool exposes only partial content.
+
+When a complete read is not performed, the agent MUST:
+
+- state or internally preserve the limitation;
+- obtain the maximum relevant context available;
+- avoid claiming the complete file was reviewed;
+- avoid high-confidence repository-wide conclusions unsupported by the available context.
+
+### Change gate
+
+For a material repository change, do not mutate until the following condition is satisfied (CTX-007):
+
+```text
+context_sufficient = target_read ∧ governing_context_read ∧ required_dependencies_read
+```
+
+- `target_read`: the target content needed for the change has been read;
+- `governing_context_read`: applicable repository or version rules have been read;
+- `required_dependencies_read`: files necessary to understand material downstream or upstream effects have been inspected.
+
+If any required term is false and cannot be resolved, preserve the limitation and fail closed for changes whose correctness depends on the missing context.
+
+### Full-read semantics
+
+"Read completely" means the agent has obtained the entire accessible textual contents of the file — not merely a search-result snippet, metadata, a preview, the first or last section, a generated summary, selected matching lines, or a truncated retrieval result. A partial retrieval MUST NOT be represented as a complete read (CTX-008).
+
+### Change impact review
+
+After editing, the agent SHOULD re-read the changed file in its resulting form and inspect affected associated files or tests sufficient to detect broken references, inconsistent terminology, contract violations, duplicated policy, unintended behavioral changes, stale documentation, and invalid generated-source relationships (CTX-009). Behavioral re-validation remains governed by `testing.rules.md`; the implementation-side impact trace remains governed by `coding.rules.md` "Change-impact procedure".
 
 ## Load ledger
 
@@ -271,6 +351,8 @@ Before final output:
 - Governing contract and instruction precedence: `AGENTS.md`
 - Untrusted-content classification and prohibited effects: `security.rules.md`
 - Machine-local facts and specialization: `AGENTS.local.md`
+- Implementation-path inspection specialization of the context-sufficiency rule: `coding.rules.md` (COD-002)
+- Behavioral validation after change: `testing.rules.md`
 
 ## References
 
@@ -299,4 +381,4 @@ Before final output:
 
 ## Lineage and migration
 
-This file preserves the compaction and selective-loading intent of `v1/context.md` and `v2/context.md` and the provider-separation, exact-prefix, stability-classification, idempotence, and telemetry controls from `v2/prompt-caching.md`. Hard-coded `/memories` storage, dated model lists, universal token thresholds, and unverified provider fields were removed. Current official provider behavior is referenced rather than frozen into one generic cache abstraction. The evidence-state claim discipline and the durable-context output bound were absorbed from `general.rules.md` during the GEN migration.
+This file preserves the compaction and selective-loading intent of `v1/context.md` and `v2/context.md` and the provider-separation, exact-prefix, stability-classification, idempotence, and telemetry controls from `v2/prompt-caching.md`. Hard-coded `/memories` storage, dated model lists, universal token thresholds, and unverified provider fields were removed. Current official provider behavior is referenced rather than frozen into one generic cache abstraction. The evidence-state claim discipline and the durable-context output bound were absorbed from `general.rules.md` during the GEN migration. On 2026-09-19 the "Context sufficiency for file processing and changes" section was added as the single authoritative Version 3 definition of the full-context-read requirement, context-discovery order for file changes, associated-file selection, change gate, full-read semantics, and change impact review; it introduces the module's first CTX-NNN identifiers (CTX-001 through CTX-009) and names `coding.rules.md` COD-002 as the implementation-path specialization rather than a duplicate.

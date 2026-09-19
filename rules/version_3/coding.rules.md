@@ -1,11 +1,6 @@
 ---
 title: Implementation and Code-Change Rules
-generated_at: 2026-09-14
-policy_version: 3
-status: active
-scope: repository
-rules_root: .
-tracking: tracked
+generated_at: "2026-09-19T00:34:01Z"
 references:
   - AGENTS.md
   - testing.rules.md
@@ -14,6 +9,12 @@ references:
   - security.rules.md
   - environments.rules.md
   - commits.rules.md
+  - context.rules.md
+policy_version: 3
+status: active
+scope: repository
+rules_root: .
+tracking: tracked
 tags: [coding, implementation, rules]
 ---
 
@@ -40,6 +41,8 @@ This file applies to new code, bug fixes, refactoring, API changes, configuratio
 | COD-013 | The agent MAY refactor only when intended behavior remains unchanged unless the behavioral change is explicit, validation is appropriate to the affected area, and the task scope does not expand silently. | The refactor is backed by evidence and scope remains bounded. |
 | COD-014 | The agent MUST use repository-native language and framework conventions where they are observable. | The change follows the local convention or a clearly higher-priority repository rule. |
 | COD-015 | The agent MUST treat completion as evidence-bound and MUST defer validation details to `testing.rules.md`. | The final report does not claim fixed, working, validated, passing, compatible, or performant without validation evidence. |
+
+`context.rules.md` CTX-001 through CTX-009 own the general sufficient-context requirement for file processing and changes; COD-002 is that rule's implementation-path specialization for code edits and does not restate it.
 
 ## Change-impact procedure
 
@@ -81,18 +84,17 @@ Formatting expectations SHOULD be machine-enforceable where practical: prefer fo
 
 ## Whitespace
 
+The byte-level whitespace protocol is owned by `configuration.rules.md`; the conventions below are the source-editing specialization.
+
 ### Horizontal whitespace
 
-- Do not leave incidental trailing whitespace; preserve it only when the file format gives it defined semantic meaning.
 - Prefer formatter-controlled spacing around operators, delimiters, keywords, declarations, and expressions.
 - Do not use whitespace for visual alignment that canonical tooling would remove or destabilize, and do not use repeated spaces to simulate tables or columns in ordinary source.
-- Avoid whitespace-only churn unrelated to the task.
-- Preserve semantic whitespace inside literals, fixed-format records, protocol payloads, and other formats where whitespace affects behavior or rendering.
 - In Markdown, do not blindly strip an intentional CommonMark hard break; prefer an unambiguous alternative such as a trailing backslash or an explicit `<br>` where practical.
 
 ### Blank lines
 
-- Use blank lines to separate logical units, not as decoration, and avoid repeated runs of unnecessary blank lines.
+- Use blank lines to separate logical units, not as decoration.
 - Follow the language-specific formatter for spacing between declarations, types, functions, methods, imports, and major logical blocks.
 - Do not insert blank lines that fragment tightly related statements without improving readability, and do not remove required or formatter-generated blank lines.
 

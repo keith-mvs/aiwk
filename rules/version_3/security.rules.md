@@ -1,15 +1,15 @@
 ---
 title: Local Development Security Rules
-generated_at: 2026-09-14
+generated_at: "2026-09-14T00:00:00Z"
+references:
+  - AGENTS.md
+  - environments.rules.md
+  - remotes.rules.md
 policy_version: 3
 status: active
 scope: repository
 rules_root: .
 tracking: tracked
-references:
-  - AGENTS.md
-  - environments.rules.md
-  - remotes.rules.md
 tags: [security, rules]
 ---
 
